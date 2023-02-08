@@ -13,5 +13,6 @@ jobs:
     - uses: codecov/codecov-action@v3
       with:
         files: ./manual.json
+        token: ${{ secrets.CODECOV_TOKEN }}
         name: codecov-test
         verbose: true
