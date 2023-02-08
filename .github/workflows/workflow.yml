@@ -1,0 +1,11 @@
+name: codecov workflow
+on: [push]
+jobs:
+  run:
+    steps:
+    - uses: actions/checkout@master
+    - uses: codecov/codecov-action@v3
+      with:
+        files: ./manual.json
+        name: codecov-test
+        verbose: true
