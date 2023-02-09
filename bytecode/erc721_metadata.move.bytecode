@@ -1,0 +1,54 @@
+// Move bytecode v6
+module 2.erc721_metadata {
+use 0000000000000000000000000000000000000001::ascii;
+use 0000000000000000000000000000000000000001::string;
+use 0000000000000000000000000000000000000002::url;
+
+
+struct ERC721Metadata has store {
+	token_id: TokenID,
+	name: String,
+	token_uri: Url
+}
+struct TokenID has copy, store {
+	id: u64
+}
+
+public name(self: &ERC721Metadata): &String {
+B0:
+	0: MoveLoc[0](self: &ERC721Metadata)
+	1: ImmBorrowField[0](ERC721Metadata.name: String)
+	2: Ret
+}
+public new(token_id: TokenID, name: vector<u8>, token_uri: vector<u8>): ERC721Metadata {
+B0:
+	0: MoveLoc[2](token_uri: vector<u8>)
+	1: Call ascii::string(vector<u8>): String
+	2: StLoc[3](uri_str: String)
+	3: MoveLoc[0](token_id: TokenID)
+	4: MoveLoc[1](name: vector<u8>)
+	5: Call string::utf8(vector<u8>): String
+	6: MoveLoc[3](uri_str: String)
+	7: Call url::new_unsafe(String): Url
+	8: Pack[0](ERC721Metadata)
+	9: Ret
+}
+public new_token_id(id: u64): TokenID {
+B0:
+	0: MoveLoc[0](id: u64)
+	1: Pack[1](TokenID)
+	2: Ret
+}
+public token_id(self: &ERC721Metadata): &TokenID {
+B0:
+	0: MoveLoc[0](self: &ERC721Metadata)
+	1: ImmBorrowField[1](ERC721Metadata.token_id: TokenID)
+	2: Ret
+}
+public token_uri(self: &ERC721Metadata): &Url {
+B0:
+	0: MoveLoc[0](self: &ERC721Metadata)
+	1: ImmBorrowField[2](ERC721Metadata.token_uri: Url)
+	2: Ret
+}
+}

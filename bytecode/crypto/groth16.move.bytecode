@@ -1,0 +1,83 @@
+// Move bytecode v6
+module 2.groth16 {
+struct PreparedVerifyingKey has copy, drop, store {
+	vk_gamma_abc_g1_bytes: vector<u8>,
+	alpha_g1_beta_g2_bytes: vector<u8>,
+	gamma_g2_neg_pc_bytes: vector<u8>,
+	delta_g2_neg_pc_bytes: vector<u8>
+}
+struct ProofPoints has copy, drop, store {
+	bytes: vector<u8>
+}
+struct PublicProofInputs has copy, drop, store {
+	bytes: vector<u8>
+}
+
+native public prepare_verifying_key(verifying_key: &vector<u8>): PreparedVerifyingKey
+public proof_points_from_bytes(bytes: vector<u8>): ProofPoints {
+B0:
+	0: MoveLoc[0](bytes: vector<u8>)
+	1: Pack[1](ProofPoints)
+	2: Ret
+}
+public public_proof_inputs_from_bytes(bytes: vector<u8>): PublicProofInputs {
+B0:
+	0: MoveLoc[0](bytes: vector<u8>)
+	1: Pack[2](PublicProofInputs)
+	2: Ret
+}
+public pvk_from_bytes(vk_gamma_abc_g1_bytes: vector<u8>, alpha_g1_beta_g2_bytes: vector<u8>, gamma_g2_neg_pc_bytes: vector<u8>, delta_g2_neg_pc_bytes: vector<u8>): PreparedVerifyingKey {
+B0:
+	0: MoveLoc[0](vk_gamma_abc_g1_bytes: vector<u8>)
+	1: MoveLoc[1](alpha_g1_beta_g2_bytes: vector<u8>)
+	2: MoveLoc[2](gamma_g2_neg_pc_bytes: vector<u8>)
+	3: MoveLoc[3](delta_g2_neg_pc_bytes: vector<u8>)
+	4: Pack[0](PreparedVerifyingKey)
+	5: Ret
+}
+public pvk_to_bytes(pvk: PreparedVerifyingKey): vector<vector<u8>> {
+B0:
+	0: VecPack(2, 0)
+	1: StLoc[1](res: vector<vector<u8>>)
+	2: MutBorrowLoc[1](res: vector<vector<u8>>)
+	3: ImmBorrowLoc[0](pvk: PreparedVerifyingKey)
+	4: ImmBorrowField[0](PreparedVerifyingKey.vk_gamma_abc_g1_bytes: vector<u8>)
+	5: ReadRef
+	6: VecPushBack(2)
+	7: MutBorrowLoc[1](res: vector<vector<u8>>)
+	8: ImmBorrowLoc[0](pvk: PreparedVerifyingKey)
+	9: ImmBorrowField[1](PreparedVerifyingKey.alpha_g1_beta_g2_bytes: vector<u8>)
+	10: ReadRef
+	11: VecPushBack(2)
+	12: MutBorrowLoc[1](res: vector<vector<u8>>)
+	13: ImmBorrowLoc[0](pvk: PreparedVerifyingKey)
+	14: ImmBorrowField[2](PreparedVerifyingKey.gamma_g2_neg_pc_bytes: vector<u8>)
+	15: ReadRef
+	16: VecPushBack(2)
+	17: MutBorrowLoc[1](res: vector<vector<u8>>)
+	18: ImmBorrowLoc[0](pvk: PreparedVerifyingKey)
+	19: ImmBorrowField[3](PreparedVerifyingKey.delta_g2_neg_pc_bytes: vector<u8>)
+	20: ReadRef
+	21: VecPushBack(2)
+	22: MoveLoc[1](res: vector<vector<u8>>)
+	23: Ret
+}
+public verify_groth16_proof(prepared_verifying_key: &PreparedVerifyingKey, public_proof_inputs: &PublicProofInputs, proof_points: &ProofPoints): bool {
+B0:
+	0: CopyLoc[0](prepared_verifying_key: &PreparedVerifyingKey)
+	1: ImmBorrowField[0](PreparedVerifyingKey.vk_gamma_abc_g1_bytes: vector<u8>)
+	2: CopyLoc[0](prepared_verifying_key: &PreparedVerifyingKey)
+	3: ImmBorrowField[1](PreparedVerifyingKey.alpha_g1_beta_g2_bytes: vector<u8>)
+	4: CopyLoc[0](prepared_verifying_key: &PreparedVerifyingKey)
+	5: ImmBorrowField[2](PreparedVerifyingKey.gamma_g2_neg_pc_bytes: vector<u8>)
+	6: MoveLoc[0](prepared_verifying_key: &PreparedVerifyingKey)
+	7: ImmBorrowField[3](PreparedVerifyingKey.delta_g2_neg_pc_bytes: vector<u8>)
+	8: MoveLoc[1](public_proof_inputs: &PublicProofInputs)
+	9: ImmBorrowField[4](PublicProofInputs.bytes: vector<u8>)
+	10: MoveLoc[2](proof_points: &ProofPoints)
+	11: ImmBorrowField[5](ProofPoints.bytes: vector<u8>)
+	12: Call verify_groth16_proof_internal(&vector<u8>, &vector<u8>, &vector<u8>, &vector<u8>, &vector<u8>, &vector<u8>): bool
+	13: Ret
+}
+native public verify_groth16_proof_internal(vk_gamma_abc_g1_bytes: &vector<u8>, alpha_g1_beta_g2_bytes: &vector<u8>, gamma_g2_neg_pc_bytes: &vector<u8>, delta_g2_neg_pc_bytes: &vector<u8>, public_proof_inputs: &vector<u8>, proof_points: &vector<u8>): bool
+}

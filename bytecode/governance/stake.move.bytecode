@@ -1,0 +1,136 @@
+// Move bytecode v6
+module 2.stake {
+use 0000000000000000000000000000000000000001::option;
+use 0000000000000000000000000000000000000002::balance;
+use 0000000000000000000000000000000000000002::epoch_time_lock;
+use 0000000000000000000000000000000000000002::locked_coin;
+use 0000000000000000000000000000000000000002::math;
+use 0000000000000000000000000000000000000002::object;
+use 0000000000000000000000000000000000000002::sui;
+use 0000000000000000000000000000000000000002::transfer;
+use 0000000000000000000000000000000000000002::tx_context;
+
+
+struct Stake has key {
+	id: UID,
+	balance: Balance<SUI>,
+	locked_until_epoch: Option<EpochTimeLock>
+}
+
+entry public burn(self: Stake, ctx: &mut TxContext) {
+B0:
+	0: MoveLoc[0](self: Stake)
+	1: Unpack[0](Stake)
+	2: StLoc[3](locked_until_epoch: Option<EpochTimeLock>)
+	3: StLoc[2](balance: Balance<SUI>)
+	4: Call object::delete(UID)
+	5: MoveLoc[2](balance: Balance<SUI>)
+	6: Call balance::destroy_zero<SUI>(Balance<SUI>)
+	7: ImmBorrowLoc[3](locked_until_epoch: Option<EpochTimeLock>)
+	8: Call option::is_some<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	9: BrFalse(16)
+B1:
+	10: MutBorrowLoc[3](locked_until_epoch: Option<EpochTimeLock>)
+	11: Call option::extract<EpochTimeLock>(&mut Option<EpochTimeLock>): EpochTimeLock
+	12: MoveLoc[1](ctx: &mut TxContext)
+	13: FreezeRef
+	14: Call epoch_time_lock::destroy(EpochTimeLock, &TxContext)
+	15: Branch(18)
+B2:
+	16: MoveLoc[1](ctx: &mut TxContext)
+	17: Pop
+B3:
+	18: MoveLoc[3](locked_until_epoch: Option<EpochTimeLock>)
+	19: Call option::destroy_none<EpochTimeLock>(Option<EpochTimeLock>)
+	20: Ret
+}
+public(friend) create(balance: Balance<SUI>, recipient: address, locked_until_epoch: Option<EpochTimeLock>, ctx: &mut TxContext) {
+B0:
+	0: MoveLoc[3](ctx: &mut TxContext)
+	1: Call object::new(&mut TxContext): UID
+	2: MoveLoc[0](balance: Balance<SUI>)
+	3: MoveLoc[2](locked_until_epoch: Option<EpochTimeLock>)
+	4: Pack[0](Stake)
+	5: MoveLoc[1](recipient: address)
+	6: Call transfer::transfer<Stake>(Stake, address)
+	7: Ret
+}
+public value(self: &Stake): u64 {
+B0:
+	0: MoveLoc[0](self: &Stake)
+	1: ImmBorrowField[0](Stake.balance: Balance<SUI>)
+	2: Call balance::value<SUI>(&Balance<SUI>): u64
+	3: Ret
+}
+public(friend) withdraw_stake(self: &mut Stake, amount: u64, ctx: &mut TxContext) {
+L0:	%#5: u64
+L1:	%#6: &mut TxContext
+L2:	%#7: Balance<SUI>
+L3:	balance: Balance<SUI>
+L4:	sender: address
+L5:	unlock_epoch: u64
+L6:	unlock_epoch#4: u64
+B0:
+	0: CopyLoc[2](ctx: &mut TxContext)
+	1: FreezeRef
+	2: Call tx_context::sender(&TxContext): address
+	3: StLoc[10](sender: address)
+	4: CopyLoc[2](ctx: &mut TxContext)
+	5: FreezeRef
+	6: Call tx_context::epoch(&TxContext): u64
+	7: LdConst[0](U64: [1, 0, 0, 0, 0, 0, 0, 0])
+	8: Add
+	9: StLoc[11](unlock_epoch: u64)
+	10: CopyLoc[0](self: &mut Stake)
+	11: MutBorrowField[0](Stake.balance: Balance<SUI>)
+	12: MoveLoc[1](amount: u64)
+	13: Call balance::split<SUI>(&mut Balance<SUI>, u64): Balance<SUI>
+	14: StLoc[9](balance: Balance<SUI>)
+	15: CopyLoc[0](self: &mut Stake)
+	16: ImmBorrowField[1](Stake.locked_until_epoch: Option<EpochTimeLock>)
+	17: Call option::is_none<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	18: BrFalse(36)
+B1:
+	19: MoveLoc[0](self: &mut Stake)
+	20: Pop
+	21: MoveLoc[9](balance: Balance<SUI>)
+	22: StLoc[5](%#3: Balance<SUI>)
+	23: MoveLoc[11](unlock_epoch: u64)
+	24: CopyLoc[2](ctx: &mut TxContext)
+	25: StLoc[4](%#2: &mut TxContext)
+	26: StLoc[3](%#1: u64)
+	27: MoveLoc[5](%#3: Balance<SUI>)
+	28: MoveLoc[3](%#1: u64)
+	29: MoveLoc[4](%#2: &mut TxContext)
+	30: FreezeRef
+	31: Call epoch_time_lock::new(u64, &TxContext): EpochTimeLock
+	32: MoveLoc[10](sender: address)
+	33: MoveLoc[2](ctx: &mut TxContext)
+	34: Call locked_coin::new_from_balance<SUI>(Balance<SUI>, EpochTimeLock, address, &mut TxContext)
+	35: Branch(57)
+B2:
+	36: MoveLoc[0](self: &mut Stake)
+	37: ImmBorrowField[1](Stake.locked_until_epoch: Option<EpochTimeLock>)
+	38: Call option::borrow<EpochTimeLock>(&Option<EpochTimeLock>): &EpochTimeLock
+	39: Call epoch_time_lock::epoch(&EpochTimeLock): u64
+	40: MoveLoc[11](unlock_epoch: u64)
+	41: Call math::max(u64, u64): u64
+	42: StLoc[12](unlock_epoch#4: u64)
+	43: MoveLoc[9](balance: Balance<SUI>)
+	44: StLoc[8](%#7: Balance<SUI>)
+	45: MoveLoc[12](unlock_epoch#4: u64)
+	46: CopyLoc[2](ctx: &mut TxContext)
+	47: StLoc[7](%#6: &mut TxContext)
+	48: StLoc[6](%#5: u64)
+	49: MoveLoc[8](%#7: Balance<SUI>)
+	50: MoveLoc[6](%#5: u64)
+	51: MoveLoc[7](%#6: &mut TxContext)
+	52: FreezeRef
+	53: Call epoch_time_lock::new(u64, &TxContext): EpochTimeLock
+	54: MoveLoc[10](sender: address)
+	55: MoveLoc[2](ctx: &mut TxContext)
+	56: Call locked_coin::new_from_balance<SUI>(Balance<SUI>, EpochTimeLock, address, &mut TxContext)
+B3:
+	57: Ret
+}
+}

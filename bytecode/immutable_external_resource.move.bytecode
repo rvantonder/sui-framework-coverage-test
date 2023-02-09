@@ -1,0 +1,43 @@
+// Move bytecode v6
+module 2.immutable_external_resource {
+use 0000000000000000000000000000000000000001::ascii;
+use 0000000000000000000000000000000000000002::digest;
+use 0000000000000000000000000000000000000002::url;
+
+
+struct ImmutableExternalResource has copy, drop, store {
+	url: Url,
+	digest: Sha3256Digest
+}
+
+public digest(self: &ImmutableExternalResource): Sha3256Digest {
+B0:
+	0: MoveLoc[0](self: &ImmutableExternalResource)
+	1: ImmBorrowField[0](ImmutableExternalResource.digest: Sha3256Digest)
+	2: ReadRef
+	3: Ret
+}
+public new(url: Url, digest: Sha3256Digest): ImmutableExternalResource {
+B0:
+	0: MoveLoc[0](url: Url)
+	1: MoveLoc[1](digest: Sha3256Digest)
+	2: Pack[0](ImmutableExternalResource)
+	3: Ret
+}
+public update(self: &mut ImmutableExternalResource, url: Url) {
+B0:
+	0: MoveLoc[0](self: &mut ImmutableExternalResource)
+	1: MutBorrowField[1](ImmutableExternalResource.url: Url)
+	2: ImmBorrowLoc[1](url: Url)
+	3: Call url::inner_url(&Url): String
+	4: Call url::update(&mut Url, String)
+	5: Ret
+}
+public url(self: &ImmutableExternalResource): Url {
+B0:
+	0: MoveLoc[0](self: &ImmutableExternalResource)
+	1: ImmBorrowField[1](ImmutableExternalResource.url: Url)
+	2: ReadRef
+	3: Ret
+}
+}

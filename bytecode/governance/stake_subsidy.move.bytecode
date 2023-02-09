@@ -1,0 +1,113 @@
+// Move bytecode v6
+module 2.stake_subsidy {
+use 0000000000000000000000000000000000000002::balance;
+use 0000000000000000000000000000000000000002::sui;
+
+
+struct StakeSubsidy has store {
+	epoch_counter: u64,
+	balance: Balance<SUI>,
+	current_epoch_amount: u64
+}
+
+public(friend) advance_epoch(subsidy: &mut StakeSubsidy, supply: &mut Supply<SUI>) {
+B0:
+	0: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	1: MutBorrowField[0](StakeSubsidy.balance: Balance<SUI>)
+	2: MoveLoc[1](supply: &mut Supply<SUI>)
+	3: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	4: ImmBorrowField[1](StakeSubsidy.current_epoch_amount: u64)
+	5: ReadRef
+	6: Call balance::increase_supply<SUI>(&mut Supply<SUI>, u64): Balance<SUI>
+	7: Call balance::join<SUI>(&mut Balance<SUI>, Balance<SUI>): u64
+	8: Pop
+	9: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	10: ImmBorrowField[2](StakeSubsidy.epoch_counter: u64)
+	11: ReadRef
+	12: LdU64(1)
+	13: Add
+	14: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	15: MutBorrowField[2](StakeSubsidy.epoch_counter: u64)
+	16: WriteRef
+	17: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	18: ImmBorrowField[2](StakeSubsidy.epoch_counter: u64)
+	19: ReadRef
+	20: LdConst[2](U64: [30, 0, 0, 0, 0, 0, 0, 0])
+	21: Mod
+	22: LdU64(0)
+	23: Eq
+	24: BrFalse(44)
+B1:
+	25: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	26: ImmBorrowField[1](StakeSubsidy.current_epoch_amount: u64)
+	27: ReadRef
+	28: CastU128
+	29: LdConst[1](U128: [232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+	30: Mul
+	31: LdConst[0](U128: [16, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+	32: Div
+	33: StLoc[2](decrease_amount: u128)
+	34: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	35: ImmBorrowField[1](StakeSubsidy.current_epoch_amount: u64)
+	36: ReadRef
+	37: MoveLoc[2](decrease_amount: u128)
+	38: CastU64
+	39: Sub
+	40: MoveLoc[0](subsidy: &mut StakeSubsidy)
+	41: MutBorrowField[1](StakeSubsidy.current_epoch_amount: u64)
+	42: WriteRef
+	43: Branch(46)
+B2:
+	44: MoveLoc[0](subsidy: &mut StakeSubsidy)
+	45: Pop
+B3:
+	46: Ret
+}
+public(friend) create(initial_stake_subsidy_amount: u64): StakeSubsidy {
+B0:
+	0: LdU64(0)
+	1: Call balance::zero<SUI>(): Balance<SUI>
+	2: MoveLoc[0](initial_stake_subsidy_amount: u64)
+	3: Pack[0](StakeSubsidy)
+	4: Ret
+}
+public current_epoch_subsidy_amount(subsidy: &StakeSubsidy): u64 {
+B0:
+	0: MoveLoc[0](subsidy: &StakeSubsidy)
+	1: ImmBorrowField[1](StakeSubsidy.current_epoch_amount: u64)
+	2: ReadRef
+	3: Ret
+}
+public(friend) mint_stake_subsidy_proportional_to_total_stake_testnet(subsidy: &mut StakeSubsidy, supply: &mut Supply<SUI>, stake_subsidy_rate: u64, total_stake: u64) {
+B0:
+	0: MoveLoc[3](total_stake: u64)
+	1: CastU128
+	2: MoveLoc[2](stake_subsidy_rate: u64)
+	3: CastU128
+	4: Mul
+	5: LdConst[0](U128: [16, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+	6: Div
+	7: StLoc[4](amount_to_mint: u128)
+	8: MoveLoc[0](subsidy: &mut StakeSubsidy)
+	9: MutBorrowField[0](StakeSubsidy.balance: Balance<SUI>)
+	10: MoveLoc[1](supply: &mut Supply<SUI>)
+	11: MoveLoc[4](amount_to_mint: u128)
+	12: CastU64
+	13: Call balance::increase_supply<SUI>(&mut Supply<SUI>, u64): Balance<SUI>
+	14: Call balance::join<SUI>(&mut Balance<SUI>, Balance<SUI>): u64
+	15: Pop
+	16: Ret
+}
+public(friend) withdraw_all(subsidy: &mut StakeSubsidy): Balance<SUI> {
+B0:
+	0: CopyLoc[0](subsidy: &mut StakeSubsidy)
+	1: ImmBorrowField[0](StakeSubsidy.balance: Balance<SUI>)
+	2: Call balance::value<SUI>(&Balance<SUI>): u64
+	3: StLoc[1](amount: u64)
+	4: MoveLoc[0](subsidy: &mut StakeSubsidy)
+	5: MutBorrowField[0](StakeSubsidy.balance: Balance<SUI>)
+	6: MoveLoc[1](amount: u64)
+	7: Call balance::split<SUI>(&mut Balance<SUI>, u64): Balance<SUI>
+	8: Ret
+}
+}

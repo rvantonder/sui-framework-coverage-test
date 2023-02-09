@@ -1,0 +1,54 @@
+// Move bytecode v6
+module 2.tx_context {
+struct TxContext has drop {
+	sender: address,
+	tx_hash: vector<u8>,
+	epoch: u64,
+	ids_created: u64
+}
+
+native derive_id(tx_hash: vector<u8>, ids_created: u64): address
+public epoch(self: &TxContext): u64 {
+B0:
+	0: MoveLoc[0](self: &TxContext)
+	1: ImmBorrowField[0](TxContext.epoch: u64)
+	2: ReadRef
+	3: Ret
+}
+ids_created(self: &TxContext): u64 {
+B0:
+	0: MoveLoc[0](self: &TxContext)
+	1: ImmBorrowField[1](TxContext.ids_created: u64)
+	2: ReadRef
+	3: Ret
+}
+public(friend) new_object(ctx: &mut TxContext): address {
+L0:	ids_created: u64
+B0:
+	0: CopyLoc[0](ctx: &mut TxContext)
+	1: ImmBorrowField[1](TxContext.ids_created: u64)
+	2: ReadRef
+	3: StLoc[2](ids_created: u64)
+	4: CopyLoc[0](ctx: &mut TxContext)
+	5: ImmBorrowField[2](TxContext.tx_hash: vector<u8>)
+	6: ReadRef
+	7: CopyLoc[2](ids_created: u64)
+	8: Call derive_id(vector<u8>, u64): address
+	9: StLoc[1](id: address)
+	10: MoveLoc[2](ids_created: u64)
+	11: LdU64(1)
+	12: Add
+	13: MoveLoc[0](ctx: &mut TxContext)
+	14: MutBorrowField[1](TxContext.ids_created: u64)
+	15: WriteRef
+	16: MoveLoc[1](id: address)
+	17: Ret
+}
+public sender(self: &TxContext): address {
+B0:
+	0: MoveLoc[0](self: &TxContext)
+	1: ImmBorrowField[3](TxContext.sender: address)
+	2: ReadRef
+	3: Ret
+}
+}

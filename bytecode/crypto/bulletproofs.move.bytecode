@@ -1,0 +1,22 @@
+// Move bytecode v6
+module 2.bulletproofs {
+use 0000000000000000000000000000000000000002::elliptic_curve;
+
+
+
+
+native native_verify_full_range_proof(proof: &vector<u8>, commitment: &vector<u8>, bit_length: u64): bool
+public verify_full_range_proof(proof: &vector<u8>, commitment: &RistrettoPoint, bit_length: u64): bool {
+B0:
+	0: MoveLoc[0](proof: &vector<u8>)
+	1: StLoc[4](%#2: &vector<u8>)
+	2: MoveLoc[1](commitment: &RistrettoPoint)
+	3: Call elliptic_curve::bytes(&RistrettoPoint): vector<u8>
+	4: StLoc[3](%#1: vector<u8>)
+	5: MoveLoc[4](%#2: &vector<u8>)
+	6: ImmBorrowLoc[3](%#1: vector<u8>)
+	7: MoveLoc[2](bit_length: u64)
+	8: Call native_verify_full_range_proof(&vector<u8>, &vector<u8>, u64): bool
+	9: Ret
+}
+}

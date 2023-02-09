@@ -1,0 +1,876 @@
+// Move bytecode v6
+module 2.staking_pool {
+use 0000000000000000000000000000000000000001::option;
+use 0000000000000000000000000000000000000002::balance;
+use 0000000000000000000000000000000000000002::coin;
+use 0000000000000000000000000000000000000002::epoch_time_lock;
+use 0000000000000000000000000000000000000002::linked_table;
+use 0000000000000000000000000000000000000002::locked_coin;
+use 0000000000000000000000000000000000000002::math;
+use 0000000000000000000000000000000000000002::object;
+use 0000000000000000000000000000000000000002::sui;
+use 0000000000000000000000000000000000000002::table_vec;
+use 0000000000000000000000000000000000000002::transfer;
+use 0000000000000000000000000000000000000002::tx_context;
+
+
+struct Delegation has key {
+	id: UID,
+	staked_sui_id: ID,
+	pool_tokens: Balance<DelegationToken>,
+	principal_sui_amount: u64
+}
+struct DelegationToken has drop {
+	dummy_field: bool
+}
+struct InactiveStakingPool has key {
+	id: UID,
+	pool: StakingPool
+}
+struct PendingDelegationEntry has drop, store {
+	delegator: address,
+	sui_amount: u64
+}
+struct PendingWithdrawEntry has store {
+	delegator: address,
+	principal_withdraw_amount: u64,
+	withdrawn_pool_tokens: Balance<DelegationToken>
+}
+struct PoolTokenExchangeRate has copy, drop {
+	sui_amount: u64,
+	pool_token_amount: u64
+}
+struct StakedSui has key {
+	id: UID,
+	validator_address: address,
+	pool_starting_epoch: u64,
+	delegation_request_epoch: u64,
+	principal: Balance<SUI>,
+	sui_token_lock: Option<EpochTimeLock>
+}
+struct StakingPool has store {
+	validator_address: address,
+	starting_epoch: u64,
+	sui_balance: u64,
+	rewards_pool: Balance<SUI>,
+	delegation_token_supply: Supply<DelegationToken>,
+	pending_delegations: LinkedTable<ID, PendingDelegationEntry>,
+	pending_withdraws: TableVec<PendingWithdrawEntry>
+}
+
+public(friend) batch_withdraw_rewards_and_burn_pool_tokens(pool: &mut StakingPool, entries: TableVec<PendingWithdrawEntry>): vector<address> * vector<Balance<SUI>> * u64 {
+L0:	principal_withdraw_amount: u64
+L1:	reward: Balance<SUI>
+L2:	rewards: vector<Balance<SUI>>
+L3:	total_rewards_withdraw_amount: u64
+L4:	withdrawn_pool_tokens: Balance<DelegationToken>
+B0:
+	0: VecPack(24, 0)
+	1: VecPack(29, 0)
+	2: LdU64(0)
+	3: StLoc[7](total_rewards_withdraw_amount: u64)
+	4: StLoc[6](rewards: vector<Balance<SUI>>)
+	5: StLoc[3](delegators: vector<address>)
+B1:
+	6: MutBorrowLoc[1](entries: TableVec<PendingWithdrawEntry>)
+	7: FreezeRef
+	8: Call table_vec::is_empty<PendingWithdrawEntry>(&TableVec<PendingWithdrawEntry>): bool
+	9: Not
+	10: BrFalse(35)
+B2:
+	11: Branch(12)
+B3:
+	12: MutBorrowLoc[1](entries: TableVec<PendingWithdrawEntry>)
+	13: Call table_vec::pop_back<PendingWithdrawEntry>(&mut TableVec<PendingWithdrawEntry>): PendingWithdrawEntry
+	14: Unpack[4](PendingWithdrawEntry)
+	15: StLoc[8](withdrawn_pool_tokens: Balance<DelegationToken>)
+	16: StLoc[4](principal_withdraw_amount: u64)
+	17: StLoc[2](delegator: address)
+	18: CopyLoc[0](pool: &mut StakingPool)
+	19: MoveLoc[4](principal_withdraw_amount: u64)
+	20: MoveLoc[8](withdrawn_pool_tokens: Balance<DelegationToken>)
+	21: Call withdraw_rewards_and_burn_pool_tokens(&mut StakingPool, u64, Balance<DelegationToken>): Balance<SUI>
+	22: StLoc[5](reward: Balance<SUI>)
+	23: MoveLoc[7](total_rewards_withdraw_amount: u64)
+	24: ImmBorrowLoc[5](reward: Balance<SUI>)
+	25: Call balance::value<SUI>(&Balance<SUI>): u64
+	26: Add
+	27: StLoc[7](total_rewards_withdraw_amount: u64)
+	28: MutBorrowLoc[3](delegators: vector<address>)
+	29: MoveLoc[2](delegator: address)
+	30: VecPushBack(24)
+	31: MutBorrowLoc[6](rewards: vector<Balance<SUI>>)
+	32: MoveLoc[5](reward: Balance<SUI>)
+	33: VecPushBack(29)
+	34: Branch(6)
+B4:
+	35: MoveLoc[0](pool: &mut StakingPool)
+	36: Pop
+	37: MoveLoc[1](entries: TableVec<PendingWithdrawEntry>)
+	38: Call table_vec::destroy_empty<PendingWithdrawEntry>(TableVec<PendingWithdrawEntry>)
+	39: MoveLoc[3](delegators: vector<address>)
+	40: MoveLoc[6](rewards: vector<Balance<SUI>>)
+	41: MoveLoc[7](total_rewards_withdraw_amount: u64)
+	42: Ret
+}
+public(friend) cancel_delegation_request(pool: &mut StakingPool, staked_sui: StakedSui, ctx: &mut TxContext) {
+L0:	id: UID
+L1:	pool_starting_epoch: u64
+L2:	principal: Balance<SUI>
+L3:	staked_sui_id: ID
+L4:	sui_token_lock: Option<EpochTimeLock>
+L5:	validator_address: address
+B0:
+	0: CopyLoc[2](ctx: &mut TxContext)
+	1: FreezeRef
+	2: Call tx_context::sender(&TxContext): address
+	3: StLoc[5](delegator: address)
+	4: ImmBorrowLoc[1](staked_sui: StakedSui)
+	5: Call object::id<StakedSui>(&StakedSui): ID
+	6: StLoc[9](staked_sui_id: ID)
+	7: CopyLoc[0](pool: &mut StakingPool)
+	8: MutBorrowField[0](StakingPool.pending_delegations: LinkedTable<ID, PendingDelegationEntry>)
+	9: CopyLoc[9](staked_sui_id: ID)
+	10: StLoc[3](%#2: ID)
+	11: FreezeRef
+	12: MoveLoc[3](%#2: ID)
+	13: Call linked_table::contains<ID, PendingDelegationEntry>(&LinkedTable<ID, PendingDelegationEntry>, ID): bool
+	14: BrFalse(16)
+B1:
+	15: Branch(22)
+B2:
+	16: MoveLoc[0](pool: &mut StakingPool)
+	17: Pop
+	18: MoveLoc[2](ctx: &mut TxContext)
+	19: Pop
+	20: LdConst[4](U64: [8, 0, 0, 0, 0, 0, 0, 0])
+	21: Abort
+B3:
+	22: CopyLoc[0](pool: &mut StakingPool)
+	23: MutBorrowField[0](StakingPool.pending_delegations: LinkedTable<ID, PendingDelegationEntry>)
+	24: MoveLoc[9](staked_sui_id: ID)
+	25: Call linked_table::remove<ID, PendingDelegationEntry>(&mut LinkedTable<ID, PendingDelegationEntry>, ID): PendingDelegationEntry
+	26: Pop
+	27: MoveLoc[1](staked_sui: StakedSui)
+	28: Unpack[6](StakedSui)
+	29: StLoc[10](sui_token_lock: Option<EpochTimeLock>)
+	30: StLoc[8](principal: Balance<SUI>)
+	31: Pop
+	32: StLoc[7](pool_starting_epoch: u64)
+	33: StLoc[11](validator_address: address)
+	34: StLoc[6](id: UID)
+	35: MoveLoc[11](validator_address: address)
+	36: CopyLoc[0](pool: &mut StakingPool)
+	37: ImmBorrowField[1](StakingPool.validator_address: address)
+	38: ReadRef
+	39: Eq
+	40: BrFalse(48)
+B4:
+	41: MoveLoc[7](pool_starting_epoch: u64)
+	42: MoveLoc[0](pool: &mut StakingPool)
+	43: ImmBorrowField[2](StakingPool.starting_epoch: u64)
+	44: ReadRef
+	45: Eq
+	46: StLoc[4](%#3: bool)
+	47: Branch(52)
+B5:
+	48: MoveLoc[0](pool: &mut StakingPool)
+	49: Pop
+	50: LdFalse
+	51: StLoc[4](%#3: bool)
+B6:
+	52: MoveLoc[4](%#3: bool)
+	53: BrFalse(55)
+B7:
+	54: Branch(59)
+B8:
+	55: MoveLoc[2](ctx: &mut TxContext)
+	56: Pop
+	57: LdConst[8](U64: [1, 0, 0, 0, 0, 0, 0, 0])
+	58: Abort
+B9:
+	59: MoveLoc[6](id: UID)
+	60: Call object::delete(UID)
+	61: ImmBorrowLoc[10](sui_token_lock: Option<EpochTimeLock>)
+	62: Call option::is_some<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	63: BrFalse(71)
+B10:
+	64: MoveLoc[8](principal: Balance<SUI>)
+	65: MoveLoc[10](sui_token_lock: Option<EpochTimeLock>)
+	66: Call option::destroy_some<EpochTimeLock>(Option<EpochTimeLock>): EpochTimeLock
+	67: MoveLoc[5](delegator: address)
+	68: MoveLoc[2](ctx: &mut TxContext)
+	69: Call locked_coin::new_from_balance<SUI>(Balance<SUI>, EpochTimeLock, address, &mut TxContext)
+	70: Branch(78)
+B11:
+	71: MoveLoc[8](principal: Balance<SUI>)
+	72: MoveLoc[2](ctx: &mut TxContext)
+	73: Call coin::from_balance<SUI>(Balance<SUI>, &mut TxContext): Coin<SUI>
+	74: MoveLoc[5](delegator: address)
+	75: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	76: MoveLoc[10](sui_token_lock: Option<EpochTimeLock>)
+	77: Call option::destroy_none<EpochTimeLock>(Option<EpochTimeLock>)
+B12:
+	78: Ret
+}
+public(friend) deactivate_staking_pool(pool: StakingPool, ctx: &mut TxContext) {
+B0:
+	0: MoveLoc[1](ctx: &mut TxContext)
+	1: Call object::new(&mut TxContext): UID
+	2: MoveLoc[0](pool: StakingPool)
+	3: Pack[2](InactiveStakingPool)
+	4: Call transfer::share_object<InactiveStakingPool>(InactiveStakingPool)
+	5: Ret
+}
+public delegation_request_epoch(staked_sui: &StakedSui): u64 {
+B0:
+	0: MoveLoc[0](staked_sui: &StakedSui)
+	1: ImmBorrowField[3](StakedSui.delegation_request_epoch: u64)
+	2: ReadRef
+	3: Ret
+}
+public delegation_token_amount(delegation: &Delegation): u64 {
+B0:
+	0: MoveLoc[0](delegation: &Delegation)
+	1: ImmBorrowField[4](Delegation.pool_tokens: Balance<DelegationToken>)
+	2: Call balance::value<DelegationToken>(&Balance<DelegationToken>): u64
+	3: Ret
+}
+public(friend) deposit_rewards(pool: &mut StakingPool, rewards: Balance<SUI>) {
+B0:
+	0: CopyLoc[0](pool: &mut StakingPool)
+	1: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	2: ReadRef
+	3: ImmBorrowLoc[1](rewards: Balance<SUI>)
+	4: Call balance::value<SUI>(&Balance<SUI>): u64
+	5: Add
+	6: CopyLoc[0](pool: &mut StakingPool)
+	7: MutBorrowField[5](StakingPool.sui_balance: u64)
+	8: WriteRef
+	9: MoveLoc[0](pool: &mut StakingPool)
+	10: MutBorrowField[6](StakingPool.rewards_pool: Balance<SUI>)
+	11: MoveLoc[1](rewards: Balance<SUI>)
+	12: Call balance::join<SUI>(&mut Balance<SUI>, Balance<SUI>): u64
+	13: Pop
+	14: Ret
+}
+destroy_delegation_and_return_pool_tokens(delegation: Delegation): Balance<DelegationToken> {
+B0:
+	0: MoveLoc[0](delegation: Delegation)
+	1: Unpack[0](Delegation)
+	2: Pop
+	3: StLoc[1](pool_tokens: Balance<DelegationToken>)
+	4: Pop
+	5: Call object::delete(UID)
+	6: MoveLoc[1](pool_tokens: Balance<DelegationToken>)
+	7: Ret
+}
+entry public destroy_empty_delegation(delegation: Delegation) {
+L0:	principal_sui_amount: u64
+B0:
+	0: MoveLoc[0](delegation: Delegation)
+	1: Unpack[0](Delegation)
+	2: StLoc[2](principal_sui_amount: u64)
+	3: StLoc[1](pool_tokens: Balance<DelegationToken>)
+	4: Pop
+	5: Call object::delete(UID)
+	6: ImmBorrowLoc[1](pool_tokens: Balance<DelegationToken>)
+	7: Call balance::value<DelegationToken>(&Balance<DelegationToken>): u64
+	8: LdU64(0)
+	9: Eq
+	10: BrFalse(12)
+B1:
+	11: Branch(14)
+B2:
+	12: LdConst[0](U64: [5, 0, 0, 0, 0, 0, 0, 0])
+	13: Abort
+B3:
+	14: MoveLoc[2](principal_sui_amount: u64)
+	15: LdU64(0)
+	16: Eq
+	17: BrFalse(19)
+B4:
+	18: Branch(21)
+B5:
+	19: LdConst[0](U64: [5, 0, 0, 0, 0, 0, 0, 0])
+	20: Abort
+B6:
+	21: MoveLoc[1](pool_tokens: Balance<DelegationToken>)
+	22: Call balance::destroy_zero<DelegationToken>(Balance<DelegationToken>)
+	23: Ret
+}
+entry public destroy_empty_staked_sui(staked_sui: StakedSui) {
+L0:	sui_token_lock: Option<EpochTimeLock>
+B0:
+	0: MoveLoc[0](staked_sui: StakedSui)
+	1: Unpack[6](StakedSui)
+	2: StLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	3: StLoc[1](principal: Balance<SUI>)
+	4: Pop
+	5: Pop
+	6: Pop
+	7: Call object::delete(UID)
+	8: ImmBorrowLoc[1](principal: Balance<SUI>)
+	9: Call balance::value<SUI>(&Balance<SUI>): u64
+	10: LdU64(0)
+	11: Eq
+	12: BrFalse(14)
+B1:
+	13: Branch(16)
+B2:
+	14: LdConst[0](U64: [5, 0, 0, 0, 0, 0, 0, 0])
+	15: Abort
+B3:
+	16: MoveLoc[1](principal: Balance<SUI>)
+	17: Call balance::destroy_zero<SUI>(Balance<SUI>)
+	18: ImmBorrowLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	19: Call option::is_none<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	20: BrFalse(22)
+B4:
+	21: Branch(24)
+B5:
+	22: LdConst[5](U64: [6, 0, 0, 0, 0, 0, 0, 0])
+	23: Abort
+B6:
+	24: MoveLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	25: Call option::destroy_none<EpochTimeLock>(Option<EpochTimeLock>)
+	26: Ret
+}
+get_sui_amount(pool: &StakingPool, token_amount: u64): u64 {
+B0:
+	0: CopyLoc[0](pool: &StakingPool)
+	1: ImmBorrowField[7](StakingPool.delegation_token_supply: Supply<DelegationToken>)
+	2: Call balance::supply_value<DelegationToken>(&Supply<DelegationToken>): u64
+	3: StLoc[2](token_supply: u64)
+	4: CopyLoc[2](token_supply: u64)
+	5: LdU64(0)
+	6: Eq
+	7: BrFalse(12)
+B1:
+	8: MoveLoc[0](pool: &StakingPool)
+	9: Pop
+	10: MoveLoc[1](token_amount: u64)
+	11: Ret
+B2:
+	12: MoveLoc[0](pool: &StakingPool)
+	13: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	14: ReadRef
+	15: CastU128
+	16: MoveLoc[1](token_amount: u64)
+	17: CastU128
+	18: Mul
+	19: MoveLoc[2](token_supply: u64)
+	20: CastU128
+	21: Div
+	22: CastU64
+	23: Ret
+}
+get_token_amount(pool: &StakingPool, sui_amount: u64): u64 {
+B0:
+	0: CopyLoc[0](pool: &StakingPool)
+	1: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	2: ReadRef
+	3: LdU64(0)
+	4: Eq
+	5: BrFalse(10)
+B1:
+	6: MoveLoc[0](pool: &StakingPool)
+	7: Pop
+	8: MoveLoc[1](sui_amount: u64)
+	9: Ret
+B2:
+	10: CopyLoc[0](pool: &StakingPool)
+	11: ImmBorrowField[7](StakingPool.delegation_token_supply: Supply<DelegationToken>)
+	12: Call balance::supply_value<DelegationToken>(&Supply<DelegationToken>): u64
+	13: CastU128
+	14: MoveLoc[1](sui_amount: u64)
+	15: CastU128
+	16: Mul
+	17: MoveLoc[0](pool: &StakingPool)
+	18: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	19: ReadRef
+	20: CastU128
+	21: Div
+	22: CastU64
+	23: Ret
+}
+mint_delegation_tokens_to_delegator(pool: &mut StakingPool, delegator: address, sui_amount: u64, staked_sui_id: ID, ctx: &mut TxContext) {
+B0:
+	0: CopyLoc[0](pool: &mut StakingPool)
+	1: CopyLoc[2](sui_amount: u64)
+	2: StLoc[5](%#2: u64)
+	3: FreezeRef
+	4: MoveLoc[5](%#2: u64)
+	5: Call get_token_amount(&StakingPool, u64): u64
+	6: StLoc[6](new_pool_token_amount: u64)
+	7: MoveLoc[0](pool: &mut StakingPool)
+	8: MutBorrowField[7](StakingPool.delegation_token_supply: Supply<DelegationToken>)
+	9: MoveLoc[6](new_pool_token_amount: u64)
+	10: Call balance::increase_supply<DelegationToken>(&mut Supply<DelegationToken>, u64): Balance<DelegationToken>
+	11: StLoc[7](pool_tokens: Balance<DelegationToken>)
+	12: MoveLoc[4](ctx: &mut TxContext)
+	13: Call object::new(&mut TxContext): UID
+	14: MoveLoc[3](staked_sui_id: ID)
+	15: MoveLoc[7](pool_tokens: Balance<DelegationToken>)
+	16: MoveLoc[2](sui_amount: u64)
+	17: Pack[0](Delegation)
+	18: MoveLoc[1](delegator: address)
+	19: Call transfer::transfer<Delegation>(Delegation, address)
+	20: Ret
+}
+public(friend) new(validator_address: address, starting_epoch: u64, ctx: &mut TxContext): StakingPool {
+B0:
+	0: MoveLoc[0](validator_address: address)
+	1: MoveLoc[1](starting_epoch: u64)
+	2: LdU64(0)
+	3: Call balance::zero<SUI>(): Balance<SUI>
+	4: LdFalse
+	5: Pack[1](DelegationToken)
+	6: Call balance::create_supply<DelegationToken>(DelegationToken): Supply<DelegationToken>
+	7: CopyLoc[2](ctx: &mut TxContext)
+	8: Call linked_table::new<ID, PendingDelegationEntry>(&mut TxContext): LinkedTable<ID, PendingDelegationEntry>
+	9: MoveLoc[2](ctx: &mut TxContext)
+	10: Call table_vec::empty<PendingWithdrawEntry>(&mut TxContext): TableVec<PendingWithdrawEntry>
+	11: Pack[7](StakingPool)
+	12: Ret
+}
+public(friend) new_pending_withdraw_entry(delegator: address, principal_withdraw_amount: u64, withdrawn_pool_tokens: Balance<DelegationToken>): PendingWithdrawEntry {
+B0:
+	0: MoveLoc[0](delegator: address)
+	1: MoveLoc[1](principal_withdraw_amount: u64)
+	2: MoveLoc[2](withdrawn_pool_tokens: Balance<DelegationToken>)
+	3: Pack[4](PendingWithdrawEntry)
+	4: Ret
+}
+public pool_token_exchange_rate(pool: &StakingPool): PoolTokenExchangeRate {
+B0:
+	0: CopyLoc[0](pool: &StakingPool)
+	1: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	2: ReadRef
+	3: MoveLoc[0](pool: &StakingPool)
+	4: ImmBorrowField[7](StakingPool.delegation_token_supply: Supply<DelegationToken>)
+	5: Call balance::supply_value<DelegationToken>(&Supply<DelegationToken>): u64
+	6: Pack[5](PoolTokenExchangeRate)
+	7: Ret
+}
+public(friend) process_pending_delegation_withdraws(pool: &mut StakingPool, ctx: &mut TxContext): u64 {
+L0:	reward_withdraw: Balance<SUI>
+L1:	total_reward_withdraw: u64
+L2:	withdrawn_pool_tokens: Balance<DelegationToken>
+B0:
+	0: LdU64(0)
+	1: StLoc[5](total_reward_withdraw: u64)
+B1:
+	2: CopyLoc[0](pool: &mut StakingPool)
+	3: ImmBorrowField[8](StakingPool.pending_withdraws: TableVec<PendingWithdrawEntry>)
+	4: Call table_vec::is_empty<PendingWithdrawEntry>(&TableVec<PendingWithdrawEntry>): bool
+	5: Not
+	6: BrFalse(31)
+B2:
+	7: Branch(8)
+B3:
+	8: CopyLoc[0](pool: &mut StakingPool)
+	9: MutBorrowField[8](StakingPool.pending_withdraws: TableVec<PendingWithdrawEntry>)
+	10: Call table_vec::pop_back<PendingWithdrawEntry>(&mut TableVec<PendingWithdrawEntry>): PendingWithdrawEntry
+	11: Unpack[4](PendingWithdrawEntry)
+	12: StLoc[6](withdrawn_pool_tokens: Balance<DelegationToken>)
+	13: StLoc[3](principal_withdraw_amount: u64)
+	14: StLoc[2](delegator: address)
+	15: CopyLoc[0](pool: &mut StakingPool)
+	16: MoveLoc[3](principal_withdraw_amount: u64)
+	17: MoveLoc[6](withdrawn_pool_tokens: Balance<DelegationToken>)
+	18: Call withdraw_rewards_and_burn_pool_tokens(&mut StakingPool, u64, Balance<DelegationToken>): Balance<SUI>
+	19: StLoc[4](reward_withdraw: Balance<SUI>)
+	20: MoveLoc[5](total_reward_withdraw: u64)
+	21: ImmBorrowLoc[4](reward_withdraw: Balance<SUI>)
+	22: Call balance::value<SUI>(&Balance<SUI>): u64
+	23: Add
+	24: StLoc[5](total_reward_withdraw: u64)
+	25: MoveLoc[4](reward_withdraw: Balance<SUI>)
+	26: CopyLoc[1](ctx: &mut TxContext)
+	27: Call coin::from_balance<SUI>(Balance<SUI>, &mut TxContext): Coin<SUI>
+	28: MoveLoc[2](delegator: address)
+	29: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	30: Branch(2)
+B4:
+	31: MoveLoc[0](pool: &mut StakingPool)
+	32: Pop
+	33: MoveLoc[1](ctx: &mut TxContext)
+	34: Pop
+	35: MoveLoc[5](total_reward_withdraw: u64)
+	36: Ret
+}
+public(friend) process_pending_delegations(pool: &mut StakingPool, ctx: &mut TxContext) {
+L0:	sui_amount: u64
+B0:
+	0: CopyLoc[0](pool: &mut StakingPool)
+	1: ImmBorrowField[0](StakingPool.pending_delegations: LinkedTable<ID, PendingDelegationEntry>)
+	2: Call linked_table::is_empty<ID, PendingDelegationEntry>(&LinkedTable<ID, PendingDelegationEntry>): bool
+	3: Not
+	4: BrFalse(28)
+B1:
+	5: Branch(6)
+B2:
+	6: CopyLoc[0](pool: &mut StakingPool)
+	7: MutBorrowField[0](StakingPool.pending_delegations: LinkedTable<ID, PendingDelegationEntry>)
+	8: Call linked_table::pop_back<ID, PendingDelegationEntry>(&mut LinkedTable<ID, PendingDelegationEntry>): ID * PendingDelegationEntry
+	9: Unpack[3](PendingDelegationEntry)
+	10: StLoc[4](sui_amount: u64)
+	11: StLoc[2](delegator: address)
+	12: StLoc[3](staked_sui_id: ID)
+	13: CopyLoc[0](pool: &mut StakingPool)
+	14: MoveLoc[2](delegator: address)
+	15: CopyLoc[4](sui_amount: u64)
+	16: MoveLoc[3](staked_sui_id: ID)
+	17: CopyLoc[1](ctx: &mut TxContext)
+	18: Call mint_delegation_tokens_to_delegator(&mut StakingPool, address, u64, ID, &mut TxContext)
+	19: CopyLoc[0](pool: &mut StakingPool)
+	20: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	21: ReadRef
+	22: MoveLoc[4](sui_amount: u64)
+	23: Add
+	24: CopyLoc[0](pool: &mut StakingPool)
+	25: MutBorrowField[5](StakingPool.sui_balance: u64)
+	26: WriteRef
+	27: Branch(0)
+B3:
+	28: MoveLoc[0](pool: &mut StakingPool)
+	29: Pop
+	30: MoveLoc[1](ctx: &mut TxContext)
+	31: Pop
+	32: Ret
+}
+public(friend) request_add_delegation(pool: &mut StakingPool, stake: Balance<SUI>, sui_token_lock: Option<EpochTimeLock>, delegator: address, ctx: &mut TxContext) {
+B0:
+	0: ImmBorrowLoc[1](stake: Balance<SUI>)
+	1: Call balance::value<SUI>(&Balance<SUI>): u64
+	2: StLoc[6](sui_amount: u64)
+	3: CopyLoc[6](sui_amount: u64)
+	4: LdU64(0)
+	5: Gt
+	6: BrFalse(8)
+B1:
+	7: Branch(14)
+B2:
+	8: MoveLoc[0](pool: &mut StakingPool)
+	9: Pop
+	10: MoveLoc[4](ctx: &mut TxContext)
+	11: Pop
+	12: LdU64(0)
+	13: Abort
+B3:
+	14: CopyLoc[4](ctx: &mut TxContext)
+	15: Call object::new(&mut TxContext): UID
+	16: CopyLoc[0](pool: &mut StakingPool)
+	17: ImmBorrowField[1](StakingPool.validator_address: address)
+	18: ReadRef
+	19: CopyLoc[0](pool: &mut StakingPool)
+	20: ImmBorrowField[2](StakingPool.starting_epoch: u64)
+	21: ReadRef
+	22: MoveLoc[4](ctx: &mut TxContext)
+	23: FreezeRef
+	24: Call tx_context::epoch(&TxContext): u64
+	25: MoveLoc[1](stake: Balance<SUI>)
+	26: MoveLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	27: Pack[6](StakedSui)
+	28: StLoc[5](staked_sui: StakedSui)
+	29: MoveLoc[0](pool: &mut StakingPool)
+	30: MutBorrowField[0](StakingPool.pending_delegations: LinkedTable<ID, PendingDelegationEntry>)
+	31: ImmBorrowLoc[5](staked_sui: StakedSui)
+	32: Call object::id<StakedSui>(&StakedSui): ID
+	33: CopyLoc[3](delegator: address)
+	34: MoveLoc[6](sui_amount: u64)
+	35: Pack[3](PendingDelegationEntry)
+	36: Call linked_table::push_back<ID, PendingDelegationEntry>(&mut LinkedTable<ID, PendingDelegationEntry>, ID, PendingDelegationEntry)
+	37: MoveLoc[5](staked_sui: StakedSui)
+	38: MoveLoc[3](delegator: address)
+	39: Call transfer::transfer<StakedSui>(StakedSui, address)
+	40: Ret
+}
+public(friend) request_withdraw_delegation(pool: &mut StakingPool, delegation: Delegation, staked_sui: StakedSui, ctx: &mut TxContext): u64 {
+L0:	withdrawn_pool_tokens: Balance<DelegationToken>
+B0:
+	0: CopyLoc[0](pool: &mut StakingPool)
+	1: MoveLoc[1](delegation: Delegation)
+	2: MoveLoc[2](staked_sui: StakedSui)
+	3: Call withdraw_from_principal(&mut StakingPool, Delegation, StakedSui): Balance<DelegationToken> * Balance<SUI> * Option<EpochTimeLock>
+	4: StLoc[7](time_lock: Option<EpochTimeLock>)
+	5: StLoc[5](principal_withdraw: Balance<SUI>)
+	6: StLoc[8](withdrawn_pool_tokens: Balance<DelegationToken>)
+	7: CopyLoc[3](ctx: &mut TxContext)
+	8: FreezeRef
+	9: Call tx_context::sender(&TxContext): address
+	10: StLoc[4](delegator: address)
+	11: ImmBorrowLoc[5](principal_withdraw: Balance<SUI>)
+	12: Call balance::value<SUI>(&Balance<SUI>): u64
+	13: StLoc[6](principal_withdraw_amount: u64)
+	14: MoveLoc[0](pool: &mut StakingPool)
+	15: MutBorrowField[8](StakingPool.pending_withdraws: TableVec<PendingWithdrawEntry>)
+	16: CopyLoc[4](delegator: address)
+	17: CopyLoc[6](principal_withdraw_amount: u64)
+	18: MoveLoc[8](withdrawn_pool_tokens: Balance<DelegationToken>)
+	19: Pack[4](PendingWithdrawEntry)
+	20: Call table_vec::push_back<PendingWithdrawEntry>(&mut TableVec<PendingWithdrawEntry>, PendingWithdrawEntry)
+	21: ImmBorrowLoc[7](time_lock: Option<EpochTimeLock>)
+	22: Call option::is_some<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	23: BrFalse(31)
+B1:
+	24: MoveLoc[5](principal_withdraw: Balance<SUI>)
+	25: MoveLoc[7](time_lock: Option<EpochTimeLock>)
+	26: Call option::destroy_some<EpochTimeLock>(Option<EpochTimeLock>): EpochTimeLock
+	27: MoveLoc[4](delegator: address)
+	28: MoveLoc[3](ctx: &mut TxContext)
+	29: Call locked_coin::new_from_balance<SUI>(Balance<SUI>, EpochTimeLock, address, &mut TxContext)
+	30: Branch(38)
+B2:
+	31: MoveLoc[5](principal_withdraw: Balance<SUI>)
+	32: MoveLoc[3](ctx: &mut TxContext)
+	33: Call coin::from_balance<SUI>(Balance<SUI>, &mut TxContext): Coin<SUI>
+	34: MoveLoc[4](delegator: address)
+	35: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	36: MoveLoc[7](time_lock: Option<EpochTimeLock>)
+	37: Call option::destroy_none<EpochTimeLock>(Option<EpochTimeLock>)
+B3:
+	38: MoveLoc[6](principal_withdraw_amount: u64)
+	39: Ret
+}
+public staked_sui_amount(staked_sui: &StakedSui): u64 {
+B0:
+	0: MoveLoc[0](staked_sui: &StakedSui)
+	1: ImmBorrowField[9](StakedSui.principal: Balance<SUI>)
+	2: Call balance::value<SUI>(&Balance<SUI>): u64
+	3: Ret
+}
+public sui_balance(pool: &StakingPool): u64 {
+B0:
+	0: MoveLoc[0](pool: &StakingPool)
+	1: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	2: ReadRef
+	3: Ret
+}
+unwrap_staked_sui(staked_sui: StakedSui): Balance<SUI> * Option<EpochTimeLock> {
+L0:	sui_token_lock: Option<EpochTimeLock>
+B0:
+	0: MoveLoc[0](staked_sui: StakedSui)
+	1: Unpack[6](StakedSui)
+	2: StLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	3: StLoc[1](principal: Balance<SUI>)
+	4: Pop
+	5: Pop
+	6: Pop
+	7: Call object::delete(UID)
+	8: MoveLoc[1](principal: Balance<SUI>)
+	9: MoveLoc[2](sui_token_lock: Option<EpochTimeLock>)
+	10: Ret
+}
+public validator_address(staked_sui: &StakedSui): address {
+B0:
+	0: MoveLoc[0](staked_sui: &StakedSui)
+	1: ImmBorrowField[10](StakedSui.validator_address: address)
+	2: ReadRef
+	3: Ret
+}
+entry public withdraw_from_inactive_pool(inactive_pool: &mut InactiveStakingPool, staked_sui: StakedSui, delegation: Delegation, ctx: &mut TxContext) {
+L0:	rewards_withdraw: Balance<SUI>
+L1:	time_lock: Option<EpochTimeLock>
+L2:	total_withdraw_amount: u64
+L3:	withdrawn_pool_tokens: Balance<DelegationToken>
+B0:
+	0: MoveLoc[0](inactive_pool: &mut InactiveStakingPool)
+	1: MutBorrowField[11](InactiveStakingPool.pool: StakingPool)
+	2: StLoc[5](pool: &mut StakingPool)
+	3: CopyLoc[5](pool: &mut StakingPool)
+	4: MoveLoc[2](delegation: Delegation)
+	5: MoveLoc[1](staked_sui: StakedSui)
+	6: Call withdraw_from_principal(&mut StakingPool, Delegation, StakedSui): Balance<DelegationToken> * Balance<SUI> * Option<EpochTimeLock>
+	7: StLoc[9](time_lock: Option<EpochTimeLock>)
+	8: StLoc[6](principal_withdraw: Balance<SUI>)
+	9: StLoc[11](withdrawn_pool_tokens: Balance<DelegationToken>)
+	10: ImmBorrowLoc[6](principal_withdraw: Balance<SUI>)
+	11: Call balance::value<SUI>(&Balance<SUI>): u64
+	12: StLoc[7](principal_withdraw_amount: u64)
+	13: CopyLoc[5](pool: &mut StakingPool)
+	14: CopyLoc[7](principal_withdraw_amount: u64)
+	15: MoveLoc[11](withdrawn_pool_tokens: Balance<DelegationToken>)
+	16: Call withdraw_rewards_and_burn_pool_tokens(&mut StakingPool, u64, Balance<DelegationToken>): Balance<SUI>
+	17: StLoc[8](rewards_withdraw: Balance<SUI>)
+	18: MoveLoc[7](principal_withdraw_amount: u64)
+	19: ImmBorrowLoc[8](rewards_withdraw: Balance<SUI>)
+	20: Call balance::value<SUI>(&Balance<SUI>): u64
+	21: Add
+	22: StLoc[10](total_withdraw_amount: u64)
+	23: CopyLoc[5](pool: &mut StakingPool)
+	24: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	25: ReadRef
+	26: MoveLoc[10](total_withdraw_amount: u64)
+	27: Sub
+	28: MoveLoc[5](pool: &mut StakingPool)
+	29: MutBorrowField[5](StakingPool.sui_balance: u64)
+	30: WriteRef
+	31: CopyLoc[3](ctx: &mut TxContext)
+	32: FreezeRef
+	33: Call tx_context::sender(&TxContext): address
+	34: StLoc[4](delegator: address)
+	35: ImmBorrowLoc[9](time_lock: Option<EpochTimeLock>)
+	36: Call option::is_some<EpochTimeLock>(&Option<EpochTimeLock>): bool
+	37: BrFalse(50)
+B1:
+	38: MoveLoc[6](principal_withdraw: Balance<SUI>)
+	39: MoveLoc[9](time_lock: Option<EpochTimeLock>)
+	40: Call option::destroy_some<EpochTimeLock>(Option<EpochTimeLock>): EpochTimeLock
+	41: CopyLoc[4](delegator: address)
+	42: CopyLoc[3](ctx: &mut TxContext)
+	43: Call locked_coin::new_from_balance<SUI>(Balance<SUI>, EpochTimeLock, address, &mut TxContext)
+	44: MoveLoc[8](rewards_withdraw: Balance<SUI>)
+	45: MoveLoc[3](ctx: &mut TxContext)
+	46: Call coin::from_balance<SUI>(Balance<SUI>, &mut TxContext): Coin<SUI>
+	47: MoveLoc[4](delegator: address)
+	48: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	49: Branch(61)
+B2:
+	50: MutBorrowLoc[6](principal_withdraw: Balance<SUI>)
+	51: MoveLoc[8](rewards_withdraw: Balance<SUI>)
+	52: Call balance::join<SUI>(&mut Balance<SUI>, Balance<SUI>): u64
+	53: Pop
+	54: MoveLoc[6](principal_withdraw: Balance<SUI>)
+	55: MoveLoc[3](ctx: &mut TxContext)
+	56: Call coin::from_balance<SUI>(Balance<SUI>, &mut TxContext): Coin<SUI>
+	57: MoveLoc[4](delegator: address)
+	58: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	59: MoveLoc[9](time_lock: Option<EpochTimeLock>)
+	60: Call option::destroy_none<EpochTimeLock>(Option<EpochTimeLock>)
+B3:
+	61: Ret
+}
+public(friend) withdraw_from_principal(pool: &mut StakingPool, delegation: Delegation, staked_sui: StakedSui): Balance<DelegationToken> * Balance<SUI> * Option<EpochTimeLock> {
+L0:	time_lock: Option<EpochTimeLock>
+B0:
+	0: ImmBorrowLoc[2](staked_sui: StakedSui)
+	1: Call object::id<StakedSui>(&StakedSui): ID
+	2: ImmBorrowLoc[1](delegation: Delegation)
+	3: ImmBorrowField[12](Delegation.staked_sui_id: ID)
+	4: ReadRef
+	5: Eq
+	6: BrFalse(8)
+B1:
+	7: Branch(12)
+B2:
+	8: MoveLoc[0](pool: &mut StakingPool)
+	9: Pop
+	10: LdConst[7](U64: [7, 0, 0, 0, 0, 0, 0, 0])
+	11: Abort
+B3:
+	12: ImmBorrowLoc[2](staked_sui: StakedSui)
+	13: ImmBorrowField[10](StakedSui.validator_address: address)
+	14: ReadRef
+	15: CopyLoc[0](pool: &mut StakingPool)
+	16: ImmBorrowField[1](StakingPool.validator_address: address)
+	17: ReadRef
+	18: Eq
+	19: BrFalse(29)
+B4:
+	20: ImmBorrowLoc[2](staked_sui: StakedSui)
+	21: ImmBorrowField[13](StakedSui.pool_starting_epoch: u64)
+	22: ReadRef
+	23: MoveLoc[0](pool: &mut StakingPool)
+	24: ImmBorrowField[2](StakingPool.starting_epoch: u64)
+	25: ReadRef
+	26: Eq
+	27: StLoc[3](%#1: bool)
+	28: Branch(33)
+B5:
+	29: MoveLoc[0](pool: &mut StakingPool)
+	30: Pop
+	31: LdFalse
+	32: StLoc[3](%#1: bool)
+B6:
+	33: MoveLoc[3](%#1: bool)
+	34: BrFalse(36)
+B7:
+	35: Branch(38)
+B8:
+	36: LdConst[8](U64: [1, 0, 0, 0, 0, 0, 0, 0])
+	37: Abort
+B9:
+	38: ImmBorrowLoc[1](delegation: Delegation)
+	39: ImmBorrowField[14](Delegation.principal_sui_amount: u64)
+	40: ReadRef
+	41: ImmBorrowLoc[2](staked_sui: StakedSui)
+	42: ImmBorrowField[9](StakedSui.principal: Balance<SUI>)
+	43: Call balance::value<SUI>(&Balance<SUI>): u64
+	44: Eq
+	45: BrFalse(47)
+B10:
+	46: Branch(49)
+B11:
+	47: LdConst[3](U64: [3, 0, 0, 0, 0, 0, 0, 0])
+	48: Abort
+B12:
+	49: MoveLoc[1](delegation: Delegation)
+	50: Call destroy_delegation_and_return_pool_tokens(Delegation): Balance<DelegationToken>
+	51: StLoc[4](pool_tokens: Balance<DelegationToken>)
+	52: MoveLoc[2](staked_sui: StakedSui)
+	53: Call unwrap_staked_sui(StakedSui): Balance<SUI> * Option<EpochTimeLock>
+	54: StLoc[6](time_lock: Option<EpochTimeLock>)
+	55: StLoc[5](principal_withdraw: Balance<SUI>)
+	56: MoveLoc[4](pool_tokens: Balance<DelegationToken>)
+	57: MoveLoc[5](principal_withdraw: Balance<SUI>)
+	58: MoveLoc[6](time_lock: Option<EpochTimeLock>)
+	59: Ret
+}
+withdraw_rewards_and_burn_pool_tokens(pool: &mut StakingPool, principal_withdraw_amount: u64, withdrawn_pool_tokens: Balance<DelegationToken>): Balance<SUI> {
+L0:	reward_withdraw_amount: u64
+L1:	total_sui_withdraw_amount: u64
+B0:
+	0: ImmBorrowLoc[2](withdrawn_pool_tokens: Balance<DelegationToken>)
+	1: Call balance::value<DelegationToken>(&Balance<DelegationToken>): u64
+	2: StLoc[5](pool_token_amount: u64)
+	3: CopyLoc[0](pool: &mut StakingPool)
+	4: MoveLoc[5](pool_token_amount: u64)
+	5: StLoc[3](%#2: u64)
+	6: FreezeRef
+	7: MoveLoc[3](%#2: u64)
+	8: Call get_sui_amount(&StakingPool, u64): u64
+	9: StLoc[7](total_sui_withdraw_amount: u64)
+	10: CopyLoc[7](total_sui_withdraw_amount: u64)
+	11: CopyLoc[1](principal_withdraw_amount: u64)
+	12: Ge
+	13: BrFalse(19)
+B1:
+	14: MoveLoc[7](total_sui_withdraw_amount: u64)
+	15: CopyLoc[1](principal_withdraw_amount: u64)
+	16: Sub
+	17: StLoc[4](%#3: u64)
+	18: Branch(21)
+B2:
+	19: LdU64(0)
+	20: StLoc[4](%#3: u64)
+B3:
+	21: MoveLoc[4](%#3: u64)
+	22: CopyLoc[0](pool: &mut StakingPool)
+	23: ImmBorrowField[6](StakingPool.rewards_pool: Balance<SUI>)
+	24: Call balance::value<SUI>(&Balance<SUI>): u64
+	25: Call math::min(u64, u64): u64
+	26: StLoc[6](reward_withdraw_amount: u64)
+	27: CopyLoc[0](pool: &mut StakingPool)
+	28: MutBorrowField[7](StakingPool.delegation_token_supply: Supply<DelegationToken>)
+	29: MoveLoc[2](withdrawn_pool_tokens: Balance<DelegationToken>)
+	30: Call balance::decrease_supply<DelegationToken>(&mut Supply<DelegationToken>, Balance<DelegationToken>): u64
+	31: Pop
+	32: CopyLoc[0](pool: &mut StakingPool)
+	33: ImmBorrowField[5](StakingPool.sui_balance: u64)
+	34: ReadRef
+	35: MoveLoc[1](principal_withdraw_amount: u64)
+	36: CopyLoc[6](reward_withdraw_amount: u64)
+	37: Add
+	38: Sub
+	39: CopyLoc[0](pool: &mut StakingPool)
+	40: MutBorrowField[5](StakingPool.sui_balance: u64)
+	41: WriteRef
+	42: MoveLoc[0](pool: &mut StakingPool)
+	43: MutBorrowField[6](StakingPool.rewards_pool: Balance<SUI>)
+	44: MoveLoc[6](reward_withdraw_amount: u64)
+	45: Call balance::split<SUI>(&mut Balance<SUI>, u64): Balance<SUI>
+	46: Ret
+}
+}

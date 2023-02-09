@@ -1,0 +1,42 @@
+// Move bytecode v6
+module 2.sui {
+use 0000000000000000000000000000000000000001::option;
+use 0000000000000000000000000000000000000002::balance;
+use 0000000000000000000000000000000000000002::coin;
+use 0000000000000000000000000000000000000002::transfer;
+use 0000000000000000000000000000000000000002::tx_context;
+use 0000000000000000000000000000000000000002::url;
+
+
+struct SUI has drop {
+	dummy_field: bool
+}
+
+public(friend) new(ctx: &mut TxContext): Supply<SUI> {
+L0:	treasury: TreasuryCap<SUI>
+B0:
+	0: LdFalse
+	1: Pack[0](SUI)
+	2: LdU8(9)
+	3: LdConst[0](Vector(U8): [3, 83, 85, 73])
+	4: LdConst[1](Vector(U8): [3, 83, 117, 105])
+	5: LdConst[2](Vector(U8): [0])
+	6: Call option::none<Url>(): Option<Url>
+	7: MoveLoc[0](ctx: &mut TxContext)
+	8: Call coin::create_currency<SUI>(SUI, u8, vector<u8>, vector<u8>, vector<u8>, Option<Url>, &mut TxContext): TreasuryCap<SUI> * CoinMetadata<SUI>
+	9: StLoc[1](metadata: CoinMetadata<SUI>)
+	10: StLoc[2](treasury: TreasuryCap<SUI>)
+	11: MoveLoc[1](metadata: CoinMetadata<SUI>)
+	12: Call transfer::freeze_object<CoinMetadata<SUI>>(CoinMetadata<SUI>)
+	13: MoveLoc[2](treasury: TreasuryCap<SUI>)
+	14: Call coin::treasury_into_supply<SUI>(TreasuryCap<SUI>): Supply<SUI>
+	15: Ret
+}
+entry public transfer(c: Coin<SUI>, recipient: address) {
+B0:
+	0: MoveLoc[0](c: Coin<SUI>)
+	1: MoveLoc[1](recipient: address)
+	2: Call transfer::transfer<Coin<SUI>>(Coin<SUI>, address)
+	3: Ret
+}
+}

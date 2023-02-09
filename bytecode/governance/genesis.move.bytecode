@@ -1,0 +1,309 @@
+// Move bytecode v6
+module 2.genesis {
+use 0000000000000000000000000000000000000001::option;
+use 0000000000000000000000000000000000000002::balance;
+use 0000000000000000000000000000000000000002::epoch_time_lock;
+use 0000000000000000000000000000000000000002::sui;
+use 0000000000000000000000000000000000000002::sui_system;
+use 0000000000000000000000000000000000000002::tx_context;
+use 0000000000000000000000000000000000000002::validator;
+
+
+
+
+create(validator_pubkeys: vector<vector<u8>>, validator_network_pubkeys: vector<vector<u8>>, validator_worker_pubkeys: vector<vector<u8>>, validator_proof_of_possessions: vector<vector<u8>>, validator_sui_addresses: vector<address>, validator_names: vector<vector<u8>>, validator_descriptions: vector<vector<u8>>, validator_image_urls: vector<vector<u8>>, validator_project_urls: vector<vector<u8>>, validator_net_addresses: vector<vector<u8>>, validator_consensus_addresses: vector<vector<u8>>, validator_worker_addresses: vector<vector<u8>>, validator_stakes: vector<u64>, validator_gas_prices: vector<u64>, validator_commission_rates: vector<u64>, epoch_start_timestamp_ms: u64, ctx: &mut TxContext) {
+L0:	name: vector<u8>
+L1:	net_address: vector<u8>
+L2:	network_pubkey: vector<u8>
+L3:	project_url: vector<u8>
+L4:	proof_of_possession: vector<u8>
+L5:	pubkey: vector<u8>
+L6:	stake: u64
+L7:	storage_fund: Balance<SUI>
+L8:	sui_address: address
+L9:	sui_supply: Supply<SUI>
+L10:	validators: vector<Validator>
+L11:	worker_address: vector<u8>
+L12:	worker_pubkey: vector<u8>
+B0:
+	0: CopyLoc[16](ctx: &mut TxContext)
+	1: Call sui::new(&mut TxContext): Supply<SUI>
+	2: StLoc[43](sui_supply: Supply<SUI>)
+	3: MutBorrowLoc[43](sui_supply: Supply<SUI>)
+	4: LdConst[1](U64: [1, 0, 0, 0, 0, 0, 0, 0])
+	5: Call balance::increase_supply<SUI>(&mut Supply<SUI>, u64): Balance<SUI>
+	6: StLoc[41](storage_fund: Balance<SUI>)
+	7: VecPack(8, 0)
+	8: StLoc[44](validators: vector<Validator>)
+	9: ImmBorrowLoc[0](validator_pubkeys: vector<vector<u8>>)
+	10: VecLen(9)
+	11: StLoc[29](count: u64)
+	12: ImmBorrowLoc[4](validator_sui_addresses: vector<address>)
+	13: VecLen(10)
+	14: CopyLoc[29](count: u64)
+	15: Eq
+	16: BrFalse(23)
+B1:
+	17: ImmBorrowLoc[12](validator_stakes: vector<u64>)
+	18: VecLen(11)
+	19: CopyLoc[29](count: u64)
+	20: Eq
+	21: StLoc[17](%#1: bool)
+	22: Branch(25)
+B2:
+	23: LdFalse
+	24: StLoc[17](%#1: bool)
+B3:
+	25: MoveLoc[17](%#1: bool)
+	26: BrFalse(33)
+B4:
+	27: ImmBorrowLoc[5](validator_names: vector<vector<u8>>)
+	28: VecLen(9)
+	29: CopyLoc[29](count: u64)
+	30: Eq
+	31: StLoc[19](%#2: bool)
+	32: Branch(35)
+B5:
+	33: LdFalse
+	34: StLoc[19](%#2: bool)
+B6:
+	35: MoveLoc[19](%#2: bool)
+	36: BrFalse(43)
+B7:
+	37: ImmBorrowLoc[6](validator_descriptions: vector<vector<u8>>)
+	38: VecLen(9)
+	39: CopyLoc[29](count: u64)
+	40: Eq
+	41: StLoc[20](%#3: bool)
+	42: Branch(45)
+B8:
+	43: LdFalse
+	44: StLoc[20](%#3: bool)
+B9:
+	45: MoveLoc[20](%#3: bool)
+	46: BrFalse(53)
+B10:
+	47: ImmBorrowLoc[7](validator_image_urls: vector<vector<u8>>)
+	48: VecLen(9)
+	49: CopyLoc[29](count: u64)
+	50: Eq
+	51: StLoc[21](%#4: bool)
+	52: Branch(55)
+B11:
+	53: LdFalse
+	54: StLoc[21](%#4: bool)
+B12:
+	55: MoveLoc[21](%#4: bool)
+	56: BrFalse(63)
+B13:
+	57: ImmBorrowLoc[8](validator_project_urls: vector<vector<u8>>)
+	58: VecLen(9)
+	59: CopyLoc[29](count: u64)
+	60: Eq
+	61: StLoc[22](%#5: bool)
+	62: Branch(65)
+B14:
+	63: LdFalse
+	64: StLoc[22](%#5: bool)
+B15:
+	65: MoveLoc[22](%#5: bool)
+	66: BrFalse(73)
+B16:
+	67: ImmBorrowLoc[9](validator_net_addresses: vector<vector<u8>>)
+	68: VecLen(9)
+	69: CopyLoc[29](count: u64)
+	70: Eq
+	71: StLoc[23](%#6: bool)
+	72: Branch(75)
+B17:
+	73: LdFalse
+	74: StLoc[23](%#6: bool)
+B18:
+	75: MoveLoc[23](%#6: bool)
+	76: BrFalse(83)
+B19:
+	77: ImmBorrowLoc[10](validator_consensus_addresses: vector<vector<u8>>)
+	78: VecLen(9)
+	79: CopyLoc[29](count: u64)
+	80: Eq
+	81: StLoc[24](%#7: bool)
+	82: Branch(85)
+B20:
+	83: LdFalse
+	84: StLoc[24](%#7: bool)
+B21:
+	85: MoveLoc[24](%#7: bool)
+	86: BrFalse(93)
+B22:
+	87: ImmBorrowLoc[11](validator_worker_addresses: vector<vector<u8>>)
+	88: VecLen(9)
+	89: CopyLoc[29](count: u64)
+	90: Eq
+	91: StLoc[25](%#8: bool)
+	92: Branch(95)
+B23:
+	93: LdFalse
+	94: StLoc[25](%#8: bool)
+B24:
+	95: MoveLoc[25](%#8: bool)
+	96: BrFalse(103)
+B25:
+	97: ImmBorrowLoc[13](validator_gas_prices: vector<u64>)
+	98: VecLen(11)
+	99: CopyLoc[29](count: u64)
+	100: Eq
+	101: StLoc[26](%#9: bool)
+	102: Branch(105)
+B26:
+	103: LdFalse
+	104: StLoc[26](%#9: bool)
+B27:
+	105: MoveLoc[26](%#9: bool)
+	106: BrFalse(113)
+B28:
+	107: ImmBorrowLoc[14](validator_commission_rates: vector<u64>)
+	108: VecLen(11)
+	109: CopyLoc[29](count: u64)
+	110: Eq
+	111: StLoc[18](%#10: bool)
+	112: Branch(115)
+B29:
+	113: LdFalse
+	114: StLoc[18](%#10: bool)
+B30:
+	115: MoveLoc[18](%#10: bool)
+	116: BrFalse(118)
+B31:
+	117: Branch(122)
+B32:
+	118: MoveLoc[16](ctx: &mut TxContext)
+	119: Pop
+	120: LdU64(1)
+	121: Abort
+B33:
+	122: LdU64(0)
+	123: StLoc[32](i: u64)
+B34:
+	124: CopyLoc[32](i: u64)
+	125: CopyLoc[29](count: u64)
+	126: Lt
+	127: BrFalse(231)
+B35:
+	128: Branch(129)
+B36:
+	129: ImmBorrowLoc[4](validator_sui_addresses: vector<address>)
+	130: CopyLoc[32](i: u64)
+	131: VecImmBorrow(10)
+	132: ReadRef
+	133: StLoc[42](sui_address: address)
+	134: ImmBorrowLoc[0](validator_pubkeys: vector<vector<u8>>)
+	135: CopyLoc[32](i: u64)
+	136: VecImmBorrow(9)
+	137: ReadRef
+	138: StLoc[39](pubkey: vector<u8>)
+	139: ImmBorrowLoc[1](validator_network_pubkeys: vector<vector<u8>>)
+	140: CopyLoc[32](i: u64)
+	141: VecImmBorrow(9)
+	142: ReadRef
+	143: StLoc[36](network_pubkey: vector<u8>)
+	144: ImmBorrowLoc[2](validator_worker_pubkeys: vector<vector<u8>>)
+	145: CopyLoc[32](i: u64)
+	146: VecImmBorrow(9)
+	147: ReadRef
+	148: StLoc[46](worker_pubkey: vector<u8>)
+	149: ImmBorrowLoc[3](validator_proof_of_possessions: vector<vector<u8>>)
+	150: CopyLoc[32](i: u64)
+	151: VecImmBorrow(9)
+	152: ReadRef
+	153: StLoc[38](proof_of_possession: vector<u8>)
+	154: ImmBorrowLoc[5](validator_names: vector<vector<u8>>)
+	155: CopyLoc[32](i: u64)
+	156: VecImmBorrow(9)
+	157: ReadRef
+	158: StLoc[34](name: vector<u8>)
+	159: ImmBorrowLoc[6](validator_descriptions: vector<vector<u8>>)
+	160: CopyLoc[32](i: u64)
+	161: VecImmBorrow(9)
+	162: ReadRef
+	163: StLoc[30](description: vector<u8>)
+	164: ImmBorrowLoc[7](validator_image_urls: vector<vector<u8>>)
+	165: CopyLoc[32](i: u64)
+	166: VecImmBorrow(9)
+	167: ReadRef
+	168: StLoc[33](image_url: vector<u8>)
+	169: ImmBorrowLoc[8](validator_project_urls: vector<vector<u8>>)
+	170: CopyLoc[32](i: u64)
+	171: VecImmBorrow(9)
+	172: ReadRef
+	173: StLoc[37](project_url: vector<u8>)
+	174: ImmBorrowLoc[9](validator_net_addresses: vector<vector<u8>>)
+	175: CopyLoc[32](i: u64)
+	176: VecImmBorrow(9)
+	177: ReadRef
+	178: StLoc[35](net_address: vector<u8>)
+	179: ImmBorrowLoc[10](validator_consensus_addresses: vector<vector<u8>>)
+	180: CopyLoc[32](i: u64)
+	181: VecImmBorrow(9)
+	182: ReadRef
+	183: StLoc[28](consensus_address: vector<u8>)
+	184: ImmBorrowLoc[11](validator_worker_addresses: vector<vector<u8>>)
+	185: CopyLoc[32](i: u64)
+	186: VecImmBorrow(9)
+	187: ReadRef
+	188: StLoc[45](worker_address: vector<u8>)
+	189: ImmBorrowLoc[12](validator_stakes: vector<u64>)
+	190: CopyLoc[32](i: u64)
+	191: VecImmBorrow(11)
+	192: ReadRef
+	193: StLoc[40](stake: u64)
+	194: ImmBorrowLoc[13](validator_gas_prices: vector<u64>)
+	195: CopyLoc[32](i: u64)
+	196: VecImmBorrow(11)
+	197: ReadRef
+	198: StLoc[31](gas_price: u64)
+	199: ImmBorrowLoc[14](validator_commission_rates: vector<u64>)
+	200: CopyLoc[32](i: u64)
+	201: VecImmBorrow(11)
+	202: ReadRef
+	203: StLoc[27](commission_rate: u64)
+	204: MutBorrowLoc[44](validators: vector<Validator>)
+	205: MoveLoc[42](sui_address: address)
+	206: MoveLoc[39](pubkey: vector<u8>)
+	207: MoveLoc[36](network_pubkey: vector<u8>)
+	208: MoveLoc[46](worker_pubkey: vector<u8>)
+	209: MoveLoc[38](proof_of_possession: vector<u8>)
+	210: MoveLoc[34](name: vector<u8>)
+	211: MoveLoc[30](description: vector<u8>)
+	212: MoveLoc[33](image_url: vector<u8>)
+	213: MoveLoc[37](project_url: vector<u8>)
+	214: MoveLoc[35](net_address: vector<u8>)
+	215: MoveLoc[28](consensus_address: vector<u8>)
+	216: MoveLoc[45](worker_address: vector<u8>)
+	217: MutBorrowLoc[43](sui_supply: Supply<SUI>)
+	218: MoveLoc[40](stake: u64)
+	219: Call balance::increase_supply<SUI>(&mut Supply<SUI>, u64): Balance<SUI>
+	220: Call option::none<EpochTimeLock>(): Option<EpochTimeLock>
+	221: MoveLoc[31](gas_price: u64)
+	222: MoveLoc[27](commission_rate: u64)
+	223: CopyLoc[16](ctx: &mut TxContext)
+	224: Call validator::new(address, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, vector<u8>, Balance<SUI>, Option<EpochTimeLock>, u64, u64, &mut TxContext): Validator
+	225: VecPushBack(8)
+	226: MoveLoc[32](i: u64)
+	227: LdU64(1)
+	228: Add
+	229: StLoc[32](i: u64)
+	230: Branch(124)
+B37:
+	231: MoveLoc[16](ctx: &mut TxContext)
+	232: Pop
+	233: MoveLoc[44](validators: vector<Validator>)
+	234: MoveLoc[43](sui_supply: Supply<SUI>)
+	235: MoveLoc[41](storage_fund: Balance<SUI>)
+	236: LdConst[0](U64: [100, 0, 0, 0, 0, 0, 0, 0])
+	237: LdConst[1](U64: [1, 0, 0, 0, 0, 0, 0, 0])
+	238: LdConst[2](U64: [64, 66, 15, 0, 0, 0, 0, 0])
+	239: MoveLoc[15](epoch_start_timestamp_ms: u64)
+	240: Call sui_system::create(vector<Validator>, Supply<SUI>, Balance<SUI>, u64, u64, u64, u64)
+	241: Ret
+}
+}
