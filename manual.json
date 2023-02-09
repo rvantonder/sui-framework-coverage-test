@@ -2,7 +2,7 @@
     "source_files": [
         {
             "name": "sources/address.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,0,0,1,null,7,7,null,1,null,5,5,null,1,null,14,14,14,14,14,null,1,null,21,21,21,null,1,null,7,7,7,7,null,0,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,1,null,7,7,null,1,null,5,5,null,1,null,14,14,14,14,14,null,1,null,21,21,21,null,1,null,7,7,7,7,null,null,null
             ]
         },
         {
@@ -37,7 +37,7 @@
         },
         {
             "name": "sources/dynamic_field.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,1,null,143,143,143,143,143,143,143,143,143,143,143,143,143,null,131,null,12,12,null,131,131,131,131,131,131,131,131,131,131,null,0,1,null,142,142,142,142,142,142,142,142,136,136,null,0,0,1,null,54,54,54,54,54,54,54,54,54,48,48,null,0,null,0,0,0,0,0,0,0,0,0,0,0,null,1,null,91,91,91,91,91,91,91,91,91,91,91,null,1,null,null,null,92,92,92,92,92,92,92,92,86,86,86,86,86,86,86,86,86,86,86,86,86,86,null,1,null,null,null,17,17,17,17,17,17,17,17,17,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,null,0,0,0,1,null,null,88,88,88,88,88,88,88,88,88,88,88,82,82,82,82,82,82,null,0,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,1,null,143,143,143,143,143,143,143,143,143,143,143,143,143,null,131,null,12,12,null,131,131,131,131,131,131,131,131,131,131,null,null,1,null,142,142,142,142,142,142,142,142,136,136,null,null,null,1,null,54,54,54,54,54,54,54,54,54,48,48,null,0,null,0,0,0,0,0,0,0,0,0,0,0,null,1,null,91,91,91,91,91,91,91,91,91,91,91,null,1,null,null,null,92,92,92,92,92,92,92,92,86,86,86,86,86,86,86,86,86,86,86,86,86,86,null,1,null,null,null,17,17,17,17,17,17,17,17,17,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,null,null,null,null,1,null,null,88,88,88,88,88,88,88,88,88,88,88,82,82,82,82,82,82,null,null,null
             ]
         },
         {
@@ -57,7 +57,7 @@
         },
         {
             "name": "sources/event.move.bytecode",
-            "coverage": [null,null,null,null,0,null
+            "coverage": [null,null,null,null,null,null
             ]
         },
         {
@@ -87,7 +87,7 @@
         },
         {
             "name": "sources/object.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,0,0,0,0,null,0,1,null,226,226,226,226,226,null,0,1,null,467,467,467,467,467,null,0,null,0,0,0,0,0,0,null,0,null,0,0,0,0,0,null,1,null,7,7,7,null,0,null,0,0,0,0,null,1,null,100,100,100,100,null,1,null,6,6,6,6,null,1,null,1270,1270,1270,1270,1270,null,1,null,131,131,131,131,131,131,null,0,1,null,16,16,16,16,null,0,null,0,0,0,null,1,null,690,690,690,690,690,null,1,null,4,4,4,4,4,null,1,null,35,35,35,35,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,0,0,0,0,null,null,1,null,226,226,226,226,226,null,null,1,null,467,467,467,467,467,null,0,null,0,0,0,0,0,0,null,0,null,0,0,0,0,0,null,1,null,7,7,7,null,0,null,0,0,0,0,null,1,null,100,100,100,100,null,1,null,6,6,6,6,null,1,null,1270,1270,1270,1270,1270,null,1,null,131,131,131,131,131,131,null,null,1,null,16,16,16,16,null,0,null,0,0,0,null,1,null,690,690,690,690,690,null,1,null,4,4,4,4,4,null,1,null,35,35,35,35,null,null
             ]
         },
         {
@@ -137,12 +137,12 @@
         },
         {
             "name": "sources/transfer.move.bytecode",
-            "coverage": [null,null,null,null,0,0,1,null,667,667,667,667,null,0,null
+            "coverage": [null,null,null,null,null,null,1,null,667,667,667,667,null,null,null
             ]
         },
         {
             "name": "sources/tx_context.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,0,1,null,540,540,540,540,null,1,null,2,2,2,2,null,1,null,null,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,null,1,null,644,644,644,644,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,1,null,540,540,540,540,null,1,null,2,2,2,2,null,1,null,null,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,1270,null,1,null,644,644,644,644,null,null
             ]
         },
         {
@@ -152,7 +152,7 @@
         },
         {
             "name": "sources/types.move.bytecode",
-            "coverage": [null,null,null,null,0,null
+            "coverage": [null,null,null,null,null,null
             ]
         },
         {
@@ -172,82 +172,82 @@
         },
         {
             "name": "sources/crypto/bls12381.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,0,1,null,2,2,2,2,2,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,1,null,2,2,2,2,2,2,2,2,null,null
             ]
         },
         {
             "name": "sources/crypto/bls12381.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,0,1,null,2,2,2,2,2,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,1,null,2,2,2,2,2,2,2,2,null,null
             ]
         },
         {
             "name": "sources/crypto/bulletproofs.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,1,null,2,2,2,2,2,2,2,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,1,null,2,2,2,2,2,2,2,2,2,2,null,null
             ]
         },
         {
             "name": "sources/crypto/bulletproofs.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,1,null,2,2,2,2,2,2,2,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,1,null,2,2,2,2,2,2,2,2,2,2,null,null
             ]
         },
         {
             "name": "sources/crypto/ecdsa_k1.move.bytecode",
-            "coverage": [null,null,null,null,0,0,0,0,0,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null
             ]
         },
         {
             "name": "sources/crypto/ecvrf.move.bytecode",
-            "coverage": [null,null,null,null,0,null
+            "coverage": [null,null,null,null,null,null
             ]
         },
         {
             "name": "sources/crypto/ed25519.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,0,null,0,0,0,0,0,0,0,0,null,null
+            "coverage": [null,null,null,null,null,null,null,null,0,null,0,0,0,0,0,0,0,0,null,null
             ]
         },
         {
             "name": "sources/crypto/ed25519.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,0,0,null,0,0,0,0,0,0,0,0,null,null
+            "coverage": [null,null,null,null,null,null,null,null,0,null,0,0,0,0,0,0,0,0,null,null
             ]
         },
         {
             "name": "sources/crypto/elliptic_curve.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,1,1,1,null,1,null,7,7,7,7,null,1,null,9,9,9,9,9,9,9,9,9,null,0,0,0,0,0,0,null,0,0,0,0,0,null,0,null,0,0,null,0,0,0,null,0,null,0,0,0,0,null,1,null,18,18,18,18,null,0,null,0,0,0,0,null,1,null,1,1,1,1,1,1,1,1,1,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,1,1,1,null,1,null,7,7,7,7,null,1,null,9,9,9,9,9,9,9,9,9,null,null,null,null,null,null,0,null,0,0,0,0,0,null,0,null,0,0,null,0,0,0,null,0,null,0,0,0,0,null,1,null,18,18,18,18,null,0,null,0,0,0,0,null,1,null,1,1,1,1,1,1,1,1,1,null,null
             ]
         },
         {
             "name": "sources/crypto/elliptic_curve.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,1,1,1,null,1,null,7,7,7,7,null,1,null,9,9,9,9,9,9,9,9,9,null,0,0,0,0,0,0,null,0,0,0,0,0,null,0,null,0,0,null,0,0,0,null,0,null,0,0,0,0,null,1,null,18,18,18,18,null,0,null,0,0,0,0,null,1,null,1,1,1,1,1,1,1,1,1,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,1,1,1,null,1,null,7,7,7,7,null,1,null,9,9,9,9,9,9,9,9,9,null,null,null,null,null,null,0,null,0,0,0,0,0,null,0,null,0,0,null,0,0,0,null,0,null,0,0,0,0,null,1,null,18,18,18,18,null,0,null,0,0,0,0,null,1,null,1,1,1,1,1,1,1,1,1,null,null
             ]
         },
         {
             "name": "sources/crypto/groth16.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,1,null,2,2,2,null,1,null,2,2,2,null,1,null,2,2,2,2,2,2,null,1,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,1,null,4,4,4,4,4,4,4,4,4,4,4,4,4,4,null,0,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,2,2,2,null,1,null,2,2,2,null,1,null,2,2,2,2,2,2,null,1,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,1,null,4,4,4,4,4,4,4,4,4,4,4,4,4,4,null,null,null
             ]
         },
         {
             "name": "sources/crypto/groth16.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,1,null,2,2,2,null,1,null,2,2,2,null,1,null,2,2,2,2,2,2,null,1,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,1,null,4,4,4,4,4,4,4,4,4,4,4,4,4,4,null,0,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,2,2,2,null,1,null,2,2,2,null,1,null,2,2,2,2,2,2,null,1,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,1,null,4,4,4,4,4,4,4,4,4,4,4,4,4,4,null,null,null
             ]
         },
         {
             "name": "sources/crypto/hmac.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,1,null,1,1,1,1,1,null,0,null
+            "coverage": [null,null,null,null,null,null,null,1,null,1,1,1,1,1,null,null,null
             ]
         },
         {
             "name": "sources/crypto/hmac.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,1,null,1,1,1,1,1,null,0,null
+            "coverage": [null,null,null,null,null,null,null,1,null,1,1,1,1,1,null,null,null
             ]
         },
         {
             "name": "sources/crypto/randomness.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,null,1,null,1,1,1,1,null,0,0,1,null,4,4,4,4,4,4,4,4,null,0,null,null,null,0,0,0,0,0,null,0,null,0,0,0,0,null,0,0,0,0,null,0,0,0,0,null,0,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,0,0,0,null,1,null,null,null,null,3,3,3,3,null,3,null,0,0,0,0,null,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,null,1,null,2,2,2,2,null,1,1,1,1,1,1,1,null,0,null,0,0,0,null,1,null,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,null,0,null,0,0,0,0,null,1,null,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,null,1,null,1,1,1,1,null,null,null,1,null,4,4,4,4,4,4,4,4,null,0,null,null,null,0,0,0,0,0,null,0,null,0,0,0,0,null,0,0,0,0,null,0,0,0,0,null,0,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,0,0,0,null,1,null,null,null,null,3,3,3,3,null,3,null,0,0,0,0,null,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,null,1,null,2,2,2,2,null,1,1,1,1,1,1,1,null,0,null,0,0,0,null,1,null,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,null,0,null,0,0,0,0,null,1,null,2,2,2,null,null
             ]
         },
         {
             "name": "sources/crypto/randomness.move.bytecode",
-            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,null,1,null,1,1,1,1,null,0,0,1,null,4,4,4,4,4,4,4,4,null,0,null,null,null,0,0,0,0,0,null,0,null,0,0,0,0,null,0,0,0,0,null,0,0,0,0,null,0,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,0,0,0,null,1,null,null,null,null,3,3,3,3,null,3,null,0,0,0,0,null,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,null,1,null,2,2,2,2,null,1,1,1,1,1,1,1,null,0,null,0,0,0,null,1,null,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,null,0,null,0,0,0,0,null,1,null,2,2,2,null,null
+            "coverage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,1,1,1,1,1,1,null,1,null,1,1,1,1,null,null,null,1,null,4,4,4,4,4,4,4,4,null,0,null,null,null,0,0,0,0,0,null,0,null,0,0,0,0,null,0,0,0,0,null,0,0,0,0,null,0,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,0,0,0,null,1,null,null,null,null,3,3,3,3,null,3,null,0,0,0,0,null,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,null,1,null,2,2,2,2,null,1,1,1,1,1,1,1,null,0,null,0,0,0,null,1,null,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,null,0,null,0,0,0,0,null,1,null,2,2,2,null,null
             ]
         },
         {
