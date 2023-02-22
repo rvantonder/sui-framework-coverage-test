@@ -11,55 +11,97 @@ struct ObjectTable<phantom K: copy + drop + store, phantom V: store + key> has s
 	size: u64
 }
 
-public add<K: copy + drop + store, V: store + key>(table: &mut ObjectTable<K, V>, k: K, v: V) {
+public new<K: copy + drop + store, V: store + key>(ctx#0#0: &mut TxContext): ObjectTable<K, V> {
 B0:
-	0: CopyLoc[0](table: &mut ObjectTable<K, V>)
+	0: MoveLoc[0](ctx#0#0: &mut TxContext)
+	1: Call object::new(&mut TxContext): UID
+	2: LdU64(0)
+	3: PackGeneric[0](ObjectTable<K, V>)
+	4: Ret
+}
+public add<K: copy + drop + store, V: store + key>(table#0#0: &mut ObjectTable<K, V>, k#0#0: K, v#0#0: V) {
+B0:
+	0: CopyLoc[0](table#0#0: &mut ObjectTable<K, V>)
 	1: MutBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
-	3: MoveLoc[2](v: V)
+	2: MoveLoc[1](k#0#0: K)
+	3: MoveLoc[2](v#0#0: V)
 	4: Call dynamic_object_field::add<K, V>(&mut UID, K, V)
-	5: CopyLoc[0](table: &mut ObjectTable<K, V>)
+	5: CopyLoc[0](table#0#0: &mut ObjectTable<K, V>)
 	6: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
 	7: ReadRef
 	8: LdU64(1)
 	9: Add
-	10: MoveLoc[0](table: &mut ObjectTable<K, V>)
+	10: MoveLoc[0](table#0#0: &mut ObjectTable<K, V>)
 	11: MutBorrowFieldGeneric[1](ObjectTable.size: u64)
 	12: WriteRef
 	13: Ret
 }
-public borrow<K: copy + drop + store, V: store + key>(table: &ObjectTable<K, V>, k: K): &V {
+public borrow<K: copy + drop + store, V: store + key>(table#0#0: &ObjectTable<K, V>, k#0#0: K): &V {
 B0:
-	0: MoveLoc[0](table: &ObjectTable<K, V>)
+	0: MoveLoc[0](table#0#0: &ObjectTable<K, V>)
 	1: ImmBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
+	2: MoveLoc[1](k#0#0: K)
 	3: Call dynamic_object_field::borrow<K, V>(&UID, K): &V
 	4: Ret
 }
-public borrow_mut<K: copy + drop + store, V: store + key>(table: &mut ObjectTable<K, V>, k: K): &mut V {
+public borrow_mut<K: copy + drop + store, V: store + key>(table#0#0: &mut ObjectTable<K, V>, k#0#0: K): &mut V {
 B0:
-	0: MoveLoc[0](table: &mut ObjectTable<K, V>)
+	0: MoveLoc[0](table#0#0: &mut ObjectTable<K, V>)
 	1: MutBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
+	2: MoveLoc[1](k#0#0: K)
 	3: Call dynamic_object_field::borrow_mut<K, V>(&mut UID, K): &mut V
 	4: Ret
 }
-public contains<K: copy + drop + store, V: store + key>(table: &ObjectTable<K, V>, k: K): bool {
+public remove<K: copy + drop + store, V: store + key>(table#0#0: &mut ObjectTable<K, V>, k#0#0: K): V {
 B0:
-	0: MoveLoc[0](table: &ObjectTable<K, V>)
+	0: CopyLoc[0](table#0#0: &mut ObjectTable<K, V>)
+	1: MutBorrowFieldGeneric[0](ObjectTable.id: UID)
+	2: MoveLoc[1](k#0#0: K)
+	3: Call dynamic_object_field::remove<K, V>(&mut UID, K): V
+	4: StLoc[2](v#1#0: V)
+	5: CopyLoc[0](table#0#0: &mut ObjectTable<K, V>)
+	6: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
+	7: ReadRef
+	8: LdU64(1)
+	9: Sub
+	10: MoveLoc[0](table#0#0: &mut ObjectTable<K, V>)
+	11: MutBorrowFieldGeneric[1](ObjectTable.size: u64)
+	12: WriteRef
+	13: MoveLoc[2](v#1#0: V)
+	14: Ret
+}
+public contains<K: copy + drop + store, V: store + key>(table#0#0: &ObjectTable<K, V>, k#0#0: K): bool {
+B0:
+	0: MoveLoc[0](table#0#0: &ObjectTable<K, V>)
 	1: ImmBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
+	2: MoveLoc[1](k#0#0: K)
 	3: Call dynamic_object_field::exists_<K>(&UID, K): bool
 	4: Ret
 }
-public destroy_empty<K: copy + drop + store, V: store + key>(table: ObjectTable<K, V>) {
-L0:	size: u64
+public length<K: copy + drop + store, V: store + key>(table#0#0: &ObjectTable<K, V>): u64 {
 B0:
-	0: MoveLoc[0](table: ObjectTable<K, V>)
+	0: MoveLoc[0](table#0#0: &ObjectTable<K, V>)
+	1: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
+	2: ReadRef
+	3: Ret
+}
+public is_empty<K: copy + drop + store, V: store + key>(table#0#0: &ObjectTable<K, V>): bool {
+B0:
+	0: MoveLoc[0](table#0#0: &ObjectTable<K, V>)
+	1: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
+	2: ReadRef
+	3: LdU64(0)
+	4: Eq
+	5: Ret
+}
+public destroy_empty<K: copy + drop + store, V: store + key>(table#0#0: ObjectTable<K, V>) {
+L0:	size#1#0: u64
+B0:
+	0: MoveLoc[0](table#0#0: ObjectTable<K, V>)
 	1: UnpackGeneric[0](ObjectTable<K, V>)
-	2: StLoc[2](size: u64)
-	3: StLoc[1](id: UID)
-	4: MoveLoc[2](size: u64)
+	2: StLoc[2](size#1#0: u64)
+	3: StLoc[1](id#1#0: UID)
+	4: MoveLoc[2](size#1#0: u64)
 	5: LdU64(0)
 	6: Eq
 	7: BrFalse(9)
@@ -69,57 +111,15 @@ B2:
 	9: LdConst[0](U64: [0, 0, 0, 0, 0, 0, 0, 0])
 	10: Abort
 B3:
-	11: MoveLoc[1](id: UID)
+	11: MoveLoc[1](id#1#0: UID)
 	12: Call object::delete(UID)
 	13: Ret
 }
-public is_empty<K: copy + drop + store, V: store + key>(table: &ObjectTable<K, V>): bool {
+public value_id<K: copy + drop + store, V: store + key>(table#0#0: &ObjectTable<K, V>, k#0#0: K): Option<ID> {
 B0:
-	0: MoveLoc[0](table: &ObjectTable<K, V>)
-	1: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
-	2: ReadRef
-	3: LdU64(0)
-	4: Eq
-	5: Ret
-}
-public length<K: copy + drop + store, V: store + key>(table: &ObjectTable<K, V>): u64 {
-B0:
-	0: MoveLoc[0](table: &ObjectTable<K, V>)
-	1: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
-	2: ReadRef
-	3: Ret
-}
-public new<K: copy + drop + store, V: store + key>(ctx: &mut TxContext): ObjectTable<K, V> {
-B0:
-	0: MoveLoc[0](ctx: &mut TxContext)
-	1: Call object::new(&mut TxContext): UID
-	2: LdU64(0)
-	3: PackGeneric[0](ObjectTable<K, V>)
-	4: Ret
-}
-public remove<K: copy + drop + store, V: store + key>(table: &mut ObjectTable<K, V>, k: K): V {
-B0:
-	0: CopyLoc[0](table: &mut ObjectTable<K, V>)
-	1: MutBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
-	3: Call dynamic_object_field::remove<K, V>(&mut UID, K): V
-	4: StLoc[2](v: V)
-	5: CopyLoc[0](table: &mut ObjectTable<K, V>)
-	6: ImmBorrowFieldGeneric[1](ObjectTable.size: u64)
-	7: ReadRef
-	8: LdU64(1)
-	9: Sub
-	10: MoveLoc[0](table: &mut ObjectTable<K, V>)
-	11: MutBorrowFieldGeneric[1](ObjectTable.size: u64)
-	12: WriteRef
-	13: MoveLoc[2](v: V)
-	14: Ret
-}
-public value_id<K: copy + drop + store, V: store + key>(table: &ObjectTable<K, V>, k: K): Option<ID> {
-B0:
-	0: MoveLoc[0](table: &ObjectTable<K, V>)
+	0: MoveLoc[0](table#0#0: &ObjectTable<K, V>)
 	1: ImmBorrowFieldGeneric[0](ObjectTable.id: UID)
-	2: MoveLoc[1](k: K)
+	2: MoveLoc[1](k#0#0: K)
 	3: Call dynamic_object_field::id<K>(&UID, K): Option<ID>
 	4: Ret
 }

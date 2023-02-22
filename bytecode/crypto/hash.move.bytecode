@@ -2,6 +2,6 @@
 module 2.hash {
 
 
-native public blake2b256(data: &vector<u8>): vector<u8>
-native public keccak256(data: &vector<u8>): vector<u8>
+native public blake2b256(data#0#0: &vector<u8>): vector<u8>
+native public keccak256(data#0#0: &vector<u8>): vector<u8>
 }

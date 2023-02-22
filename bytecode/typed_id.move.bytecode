@@ -7,33 +7,33 @@ struct TypedID<phantom T: key> has copy, drop, store {
 	id: ID
 }
 
-public as_id<T: key>(typed_id: &TypedID<T>): &ID {
+public new<T: key>(obj#0#0: &T): TypedID<T> {
 B0:
-	0: MoveLoc[0](typed_id: &TypedID<T>)
-	1: ImmBorrowFieldGeneric[0](TypedID.id: ID)
-	2: Ret
-}
-public equals_object<T: key>(typed_id: &TypedID<T>, obj: &T): bool {
-B0:
-	0: MoveLoc[0](typed_id: &TypedID<T>)
-	1: ImmBorrowFieldGeneric[0](TypedID.id: ID)
-	2: ReadRef
-	3: MoveLoc[1](obj: &T)
-	4: Call object::id<T>(&T): ID
-	5: Eq
-	6: Ret
-}
-public new<T: key>(obj: &T): TypedID<T> {
-B0:
-	0: MoveLoc[0](obj: &T)
+	0: MoveLoc[0](obj#0#0: &T)
 	1: Call object::id<T>(&T): ID
 	2: PackGeneric[0](TypedID<T>)
 	3: Ret
 }
-public to_id<T: key>(typed_id: TypedID<T>): ID {
+public as_id<T: key>(typed_id#0#0: &TypedID<T>): &ID {
 B0:
-	0: MoveLoc[0](typed_id: TypedID<T>)
+	0: MoveLoc[0](typed_id#0#0: &TypedID<T>)
+	1: ImmBorrowFieldGeneric[0](TypedID.id: ID)
+	2: Ret
+}
+public to_id<T: key>(typed_id#0#0: TypedID<T>): ID {
+B0:
+	0: MoveLoc[0](typed_id#0#0: TypedID<T>)
 	1: UnpackGeneric[0](TypedID<T>)
 	2: Ret
+}
+public equals_object<T: key>(typed_id#0#0: &TypedID<T>, obj#0#0: &T): bool {
+B0:
+	0: MoveLoc[0](typed_id#0#0: &TypedID<T>)
+	1: ImmBorrowFieldGeneric[0](TypedID.id: ID)
+	2: ReadRef
+	3: MoveLoc[1](obj#0#0: &T)
+	4: Call object::id<T>(&T): ID
+	5: Eq
+	6: Ret
 }
 }

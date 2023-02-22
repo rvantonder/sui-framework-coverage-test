@@ -8,38 +8,38 @@ use 0000000000000000000000000000000000000002::hex;
 
 
 
-native public from_bytes(bytes: vector<u8>): address
-native public from_u256(n: u256): address
-public length(): u64 {
+native public to_u256(a#0#0: address): u256
+native public from_u256(n#0#0: u256): address
+native public from_bytes(bytes#0#0: vector<u8>): address
+public to_bytes(a#0#0: address): vector<u8> {
 B0:
-	0: LdConst[2](U64: [20, 0, 0, 0, 0, 0, 0, 0])
-	1: Ret
+	0: ImmBorrowLoc[0](a#0#0: address)
+	1: Call bcs::to_bytes<address>(&address): vector<u8>
+	2: Ret
 }
-public max(): u256 {
+public to_ascii_string(a#0#0: address): String {
 B0:
-	0: LdConst[3](U256: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-	1: Ret
-}
-public to_ascii_string(a: address): String {
-B0:
-	0: MoveLoc[0](a: address)
+	0: MoveLoc[0](a#0#0: address)
 	1: Call to_bytes(address): vector<u8>
 	2: Call hex::encode(vector<u8>): vector<u8>
 	3: Call ascii::string(vector<u8>): String
 	4: Ret
 }
-public to_bytes(a: address): vector<u8> {
+public to_string(a#0#0: address): String {
 B0:
-	0: ImmBorrowLoc[0](a: address)
-	1: Call bcs::to_bytes<address>(&address): vector<u8>
-	2: Ret
-}
-public to_string(a: address): String {
-B0:
-	0: MoveLoc[0](a: address)
+	0: MoveLoc[0](a#0#0: address)
 	1: Call to_ascii_string(address): String
 	2: Call string::from_ascii(String): String
 	3: Ret
 }
-native public to_u256(a: address): u256
+public length(): u64 {
+B0:
+	0: LdConst[0](U64: [20, 0, 0, 0, 0, 0, 0, 0])
+	1: Ret
+}
+public max(): u256 {
+B0:
+	0: LdConst[1](U256: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+	1: Ret
+}
 }

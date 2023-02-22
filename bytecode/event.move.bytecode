@@ -2,5 +2,5 @@
 module 2.event {
 
 
-native public emit<T: copy + drop>(event: T)
+native public emit<T: copy + drop>(event#0#0: T)
 }

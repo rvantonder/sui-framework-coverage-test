@@ -2,14 +2,14 @@
 module 2.transfer {
 
 
-native public freeze_object<T: key>(obj: T)
-native public share_object<T: key>(obj: T)
-public transfer<T: key>(obj: T, recipient: address) {
+public transfer<T: key>(obj#0#0: T, recipient#0#0: address) {
 B0:
-	0: MoveLoc[0](obj: T)
-	1: MoveLoc[1](recipient: address)
+	0: MoveLoc[0](obj#0#0: T)
+	1: MoveLoc[1](recipient#0#0: address)
 	2: Call transfer_internal<T>(T, address)
 	3: Ret
 }
-native transfer_internal<T: key>(obj: T, recipient: address)
+native public freeze_object<T: key>(obj#0#0: T)
+native public share_object<T: key>(obj#0#0: T)
+native transfer_internal<T: key>(obj#0#0: T, recipient#0#0: address)
 }

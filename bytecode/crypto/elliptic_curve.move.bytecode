@@ -7,45 +7,78 @@ struct Scalar has copy, drop, store {
 	value: vector<u8>
 }
 
-public add(self: &RistrettoPoint, other: &RistrettoPoint): RistrettoPoint {
+native native_create_pedersen_commitment(value#0#0: vector<u8>, blinding_factor#0#0: vector<u8>): vector<u8>
+native native_add_ristretto_point(point1#0#0: vector<u8>, point2#0#0: vector<u8>): vector<u8>
+native native_subtract_ristretto_point(point1#0#0: vector<u8>, point2#0#0: vector<u8>): vector<u8>
+native native_scalar_from_u64(value#0#0: u64): vector<u8>
+native native_scalar_from_bytes(bytes#0#0: vector<u8>): vector<u8>
+public new_scalar_from_u64(value#0#0: u64): Scalar {
 B0:
-	0: MoveLoc[0](self: &RistrettoPoint)
-	1: ImmBorrowField[0](RistrettoPoint.value: vector<u8>)
-	2: ReadRef
-	3: MoveLoc[1](other: &RistrettoPoint)
-	4: ImmBorrowField[0](RistrettoPoint.value: vector<u8>)
-	5: ReadRef
-	6: Call native_add_ristretto_point(vector<u8>, vector<u8>): vector<u8>
-	7: Pack[0](RistrettoPoint)
-	8: Ret
-}
-public bytes(self: &RistrettoPoint): vector<u8> {
-B0:
-	0: MoveLoc[0](self: &RistrettoPoint)
-	1: ImmBorrowField[0](RistrettoPoint.value: vector<u8>)
-	2: ReadRef
+	0: MoveLoc[0](value#0#0: u64)
+	1: Call native_scalar_from_u64(u64): vector<u8>
+	2: Pack[1](Scalar)
 	3: Ret
 }
-public create_pedersen_commitment(value: Scalar, blinding_factor: Scalar): RistrettoPoint {
+public create_pedersen_commitment(value#0#0: Scalar, blinding_factor#0#0: Scalar): RistrettoPoint {
 B0:
-	0: ImmBorrowLoc[0](value: Scalar)
-	1: ImmBorrowField[1](Scalar.value: vector<u8>)
+	0: ImmBorrowLoc[0](value#0#0: Scalar)
+	1: ImmBorrowField[0](Scalar.value: vector<u8>)
 	2: ReadRef
-	3: ImmBorrowLoc[1](blinding_factor: Scalar)
-	4: ImmBorrowField[1](Scalar.value: vector<u8>)
+	3: ImmBorrowLoc[1](blinding_factor#0#0: Scalar)
+	4: ImmBorrowField[0](Scalar.value: vector<u8>)
 	5: ReadRef
 	6: Call native_create_pedersen_commitment(vector<u8>, vector<u8>): vector<u8>
 	7: Pack[0](RistrettoPoint)
 	8: Ret
 }
-native native_add_ristretto_point(point1: vector<u8>, point2: vector<u8>): vector<u8>
-native native_create_pedersen_commitment(value: vector<u8>, blinding_factor: vector<u8>): vector<u8>
-native native_scalar_from_bytes(bytes: vector<u8>): vector<u8>
-native native_scalar_from_u64(value: u64): vector<u8>
-native native_subtract_ristretto_point(point1: vector<u8>, point2: vector<u8>): vector<u8>
-public new_from_bytes(bytes: vector<u8>): RistrettoPoint {
+public new_scalar_from_bytes(value#0#0: vector<u8>): Scalar {
 B0:
-	0: ImmBorrowLoc[0](bytes: vector<u8>)
+	0: MoveLoc[0](value#0#0: vector<u8>)
+	1: Call native_scalar_from_bytes(vector<u8>): vector<u8>
+	2: Pack[1](Scalar)
+	3: Ret
+}
+public scalar_bytes(self#0#0: &Scalar): vector<u8> {
+B0:
+	0: MoveLoc[0](self#0#0: &Scalar)
+	1: ImmBorrowField[0](Scalar.value: vector<u8>)
+	2: ReadRef
+	3: Ret
+}
+public bytes(self#0#0: &RistrettoPoint): vector<u8> {
+B0:
+	0: MoveLoc[0](self#0#0: &RistrettoPoint)
+	1: ImmBorrowField[1](RistrettoPoint.value: vector<u8>)
+	2: ReadRef
+	3: Ret
+}
+public add(self#0#0: &RistrettoPoint, other#0#0: &RistrettoPoint): RistrettoPoint {
+B0:
+	0: MoveLoc[0](self#0#0: &RistrettoPoint)
+	1: ImmBorrowField[1](RistrettoPoint.value: vector<u8>)
+	2: ReadRef
+	3: MoveLoc[1](other#0#0: &RistrettoPoint)
+	4: ImmBorrowField[1](RistrettoPoint.value: vector<u8>)
+	5: ReadRef
+	6: Call native_add_ristretto_point(vector<u8>, vector<u8>): vector<u8>
+	7: Pack[0](RistrettoPoint)
+	8: Ret
+}
+public subtract(self#0#0: &RistrettoPoint, other#0#0: &RistrettoPoint): RistrettoPoint {
+B0:
+	0: MoveLoc[0](self#0#0: &RistrettoPoint)
+	1: ImmBorrowField[1](RistrettoPoint.value: vector<u8>)
+	2: ReadRef
+	3: MoveLoc[1](other#0#0: &RistrettoPoint)
+	4: ImmBorrowField[1](RistrettoPoint.value: vector<u8>)
+	5: ReadRef
+	6: Call native_subtract_ristretto_point(vector<u8>, vector<u8>): vector<u8>
+	7: Pack[0](RistrettoPoint)
+	8: Ret
+}
+public new_from_bytes(bytes#0#0: vector<u8>): RistrettoPoint {
+B0:
+	0: ImmBorrowLoc[0](bytes#0#0: vector<u8>)
 	1: VecLen(10)
 	2: LdU64(32)
 	3: Eq
@@ -56,41 +89,8 @@ B2:
 	6: LdU64(1)
 	7: Abort
 B3:
-	8: MoveLoc[0](bytes: vector<u8>)
+	8: MoveLoc[0](bytes#0#0: vector<u8>)
 	9: Pack[0](RistrettoPoint)
 	10: Ret
-}
-public new_scalar_from_bytes(value: vector<u8>): Scalar {
-B0:
-	0: MoveLoc[0](value: vector<u8>)
-	1: Call native_scalar_from_bytes(vector<u8>): vector<u8>
-	2: Pack[1](Scalar)
-	3: Ret
-}
-public new_scalar_from_u64(value: u64): Scalar {
-B0:
-	0: MoveLoc[0](value: u64)
-	1: Call native_scalar_from_u64(u64): vector<u8>
-	2: Pack[1](Scalar)
-	3: Ret
-}
-public scalar_bytes(self: &Scalar): vector<u8> {
-B0:
-	0: MoveLoc[0](self: &Scalar)
-	1: ImmBorrowField[1](Scalar.value: vector<u8>)
-	2: ReadRef
-	3: Ret
-}
-public subtract(self: &RistrettoPoint, other: &RistrettoPoint): RistrettoPoint {
-B0:
-	0: MoveLoc[0](self: &RistrettoPoint)
-	1: ImmBorrowField[0](RistrettoPoint.value: vector<u8>)
-	2: ReadRef
-	3: MoveLoc[1](other: &RistrettoPoint)
-	4: ImmBorrowField[0](RistrettoPoint.value: vector<u8>)
-	5: ReadRef
-	6: Call native_subtract_ristretto_point(vector<u8>, vector<u8>): vector<u8>
-	7: Pack[0](RistrettoPoint)
-	8: Ret
 }
 }

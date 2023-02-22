@@ -5,13 +5,13 @@ use 0000000000000000000000000000000000000002::digest;
 
 
 
-public hmac_sha3_256(key: &vector<u8>, msg: &vector<u8>): Sha3256Digest {
+native native_hmac_sha3_256(key#0#0: &vector<u8>, msg#0#0: &vector<u8>): vector<u8>
+public hmac_sha3_256(key#0#0: &vector<u8>, msg#0#0: &vector<u8>): Sha3256Digest {
 B0:
-	0: MoveLoc[0](key: &vector<u8>)
-	1: MoveLoc[1](msg: &vector<u8>)
+	0: MoveLoc[0](key#0#0: &vector<u8>)
+	1: MoveLoc[1](msg#0#0: &vector<u8>)
 	2: Call native_hmac_sha3_256(&vector<u8>, &vector<u8>): vector<u8>
 	3: Call digest::sha3_256_digest_from_bytes(vector<u8>): Sha3256Digest
 	4: Ret
 }
-native native_hmac_sha3_256(key: &vector<u8>, msg: &vector<u8>): vector<u8>
 }

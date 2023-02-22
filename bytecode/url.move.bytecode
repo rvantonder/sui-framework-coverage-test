@@ -7,30 +7,30 @@ struct Url has copy, drop, store {
 	url: String
 }
 
-public inner_url(self: &Url): String {
+public new_unsafe(url#0#0: String): Url {
 B0:
-	0: MoveLoc[0](self: &Url)
-	1: ImmBorrowField[0](Url.url: String)
-	2: ReadRef
-	3: Ret
-}
-public new_unsafe(url: String): Url {
-B0:
-	0: MoveLoc[0](url: String)
+	0: MoveLoc[0](url#0#0: String)
 	1: Pack[0](Url)
 	2: Ret
 }
-public new_unsafe_from_bytes(bytes: vector<u8>): Url {
+public new_unsafe_from_bytes(bytes#0#0: vector<u8>): Url {
 B0:
-	0: MoveLoc[0](bytes: vector<u8>)
+	0: MoveLoc[0](bytes#0#0: vector<u8>)
 	1: Call ascii::string(vector<u8>): String
 	2: Pack[0](Url)
 	3: Ret
 }
-public update(self: &mut Url, url: String) {
+public inner_url(self#0#0: &Url): String {
 B0:
-	0: MoveLoc[1](url: String)
-	1: MoveLoc[0](self: &mut Url)
+	0: MoveLoc[0](self#0#0: &Url)
+	1: ImmBorrowField[0](Url.url: String)
+	2: ReadRef
+	3: Ret
+}
+public update(self#0#0: &mut Url, url#0#0: String) {
+B0:
+	0: MoveLoc[1](url#0#0: String)
+	1: MoveLoc[0](self#0#0: &mut Url)
 	2: MutBorrowField[0](Url.url: String)
 	3: WriteRef
 	4: Ret
